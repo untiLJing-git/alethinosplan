@@ -4,13 +4,14 @@ test.beforeEach(async ({ page }) => {
   await page.clock.install({ time: new Date('2026-10-15T04:00:00Z') });
 });
 
-test('unconfigured email service is honest and demo is explicit', async ({ page }) => {
+test('public auth has no demo entry and development demo is explicit', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: '欢迎回来' })).toBeVisible();
   await expect(page.locator('.auth-submit')).toBeDisabled();
-  await expect(page.getByText('邮箱服务尚未配置。可先体验演示。')).toBeVisible();
+  await expect(page.getByText('邮箱服务尚未配置。', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /先体验/ })).toHaveCount(0);
   await page.screenshot({ path: 'test-results/auth-desktop.png', fullPage: true });
-  await page.getByRole('button', { name: '先体验，不注册' }).click();
+  await page.goto('/?demo=1');
   await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
   await expect(page.getByTestId('sticky-task')).toHaveCount(3);
 });

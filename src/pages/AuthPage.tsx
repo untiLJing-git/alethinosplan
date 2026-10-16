@@ -1,16 +1,17 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
 import { Brand } from '../components/Brand';
+import { ProductPreview } from '../components/ProductPreview';
 import { supabase, authConfigurationError } from '../lib/supabase';
 import { authErrorMessage, isRegisteredEmailError, REGISTERED_EMAIL_MESSAGE } from '../lib/errors';
 import { getSignupOutcome } from '../lib/signup';
 import type { SignupOutcome } from '../lib/signup';
 
 type AuthMode = 'login' | 'signup' | 'reset' | 'recovery';
-interface Props { onDemo(): void; recovering: boolean; onRecovered(): void; sessionError?: string }
+interface Props { recovering: boolean; onRecovered(): void; sessionError?: string }
 
-export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Props) {
+export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
   const [mode, setMode] = useState<AuthMode>(recovering ? 'recovery' : 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,11 +21,13 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
   const [message, setMessage] = useState('');
   const [signupOutcome, setSignupOutcome] = useState<SignupOutcome | null>(null);
   const requestPending = useRef(false);
+  const [previewInterruption, setPreviewInterruption] = useState(0);
   const titles = { login: '欢迎回来', signup: '创建你的账号', reset: '找回密码', recovery: '设置新密码' };
   const submitLabels = { login: '登录', signup: '注册', reset: '发送重置邮件', recovery: '保存新密码' };
 
   function changeMode(next: AuthMode) {
     if (next === mode || requestPending.current) return;
+    setPreviewInterruption(value => value + 1);
     setMode(next); setError(''); setMessage(''); setPassword(''); setShowPassword(false); setSignupOutcome(null);
   }
   function changeEmail(value: string) {
@@ -32,6 +35,7 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setPreviewInterruption(value => value + 1);
     if (requestPending.current) return;
     if (!supabase) { setError(authConfigurationError || '邮箱服务尚未配置。'); return; }
     requestPending.current = true;
@@ -67,16 +71,17 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
   return <main className="auth-page">
     <section className="auth-story" aria-label="alēthinósplan">
       <Brand light />
-      <div className="auth-story-copy"><span className="eyebrow">A LITTLE PLAN. A REAL STEP.</span><h1>计划很轻，<br />每一步都算数。</h1></div>
-      <div className="auth-paper-scene" aria-hidden="true">
-        <div className="auth-paper paper-sky"><span className="paper-tape" /><small>今天</small><strong>读一章喜欢的书</strong><span className="paper-detail">20 分钟，留给自己。</span></div>
-        <div className="auth-paper paper-lemon"><span className="paper-tape" /><small>一件一件，慢慢来</small><strong>开始那个想做的计划</strong><span className="auth-paper-check"><Check size={19} /> 完成，然后放下。</span></div>
+      <div className="auth-story-copy"><span className="eyebrow">A LITTLE PLAN. A REAL STEP.</span><h1>从一个念头，<br />到一件完成的事。</h1></div>
+      <ProductPreview interruption={previewInterruption} enabled={mode === 'login' || mode === 'signup'} />
+      <div className="auth-story-note">
+        <p className="auth-story-note-title">不必填满每一天。</p>
+        <p className="auth-story-note-body">留一点余地，把在意的小事慢慢完成。</p>
       </div>
-      <span className="auth-story-bottom">YOUR DAY, YOUR OWN PACE.</span>
     </section>
     <section className="auth-panel">
-      <div className="auth-mobile-brand"><Brand /></div>
-      <div className="auth-form-wrap">
+      <div className="auth-form-wrap" onFocusCapture={event => {
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) setPreviewInterruption(value => value + 1);
+      }}>
         {(mode === 'reset') && <button className="text-button auth-back" type="button" onClick={() => changeMode('login')} disabled={pending}><ArrowLeft size={16} /> 返回登录</button>}
         <h2>{titles[mode]}</h2>
         <p className="auth-subtitle">{mode === 'signup' ? '用邮箱保存你的计划。' : mode === 'reset' ? '我们会发送一封重置邮件。' : mode === 'recovery' ? '为账号设置新的密码。' : '继续你的计划。'}</p>
@@ -93,8 +98,7 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
           {message && <p className="form-success" role="status"><Mail size={17} />{message}</p>}
           <button className="button primary auth-submit" type="submit" disabled={pending || !supabase}>{pending ? <LoaderCircle className="spin" size={18} /> : null}{submitLabels[mode]}{!pending && <ArrowRight size={17} />}</button>
         </form>
-        {!supabase && <p className="auth-config" role="status">{authConfigurationError}可先体验演示。</p>}
-        {!recovering && <button className="demo-link" type="button" onClick={onDemo} disabled={pending}>先体验，不注册 <ArrowRight size={15} /></button>}
+        {!supabase && <p className="auth-config" role="status">{authConfigurationError}</p>}
       </div>
       <span className="auth-footer">alēthinósplan</span>
     </section>

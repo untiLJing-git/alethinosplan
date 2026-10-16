@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.test-build/
 .env
 .env.*
 !.env.example
@@ -7,3 +8,7 @@ dist/
 playwright-report/
 test-results/
 .DS_Store
+.wrangler/
+.dev.vars
+.dev.vars.*
+.test-workers/

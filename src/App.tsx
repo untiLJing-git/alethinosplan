@@ -15,6 +15,7 @@ import { useToday } from './hooks/useToday';
 import { cloudRepository, demoRepository } from './lib/repository';
 import { supabase } from './lib/supabase';
 import { scheduledPatch } from './lib/tasks';
+import { isDevelopmentDemoRequested } from './lib/demoMode';
 import type { Page, Task, TaskDraft } from './lib/types';
 
 interface Toast { label: string; action?: () => Promise<boolean> }
@@ -125,13 +126,12 @@ function Workspace({ demo, user, onExit, authError }: WorkspaceProps) {
 
 export default function App() {
   const auth = useAuth();
-  const [demo, setDemo] = useState(() => new URLSearchParams(location.search).get('demo') === '1');
-  function enterDemo() { const url = new URL(location.href); url.searchParams.set('demo', '1'); history.replaceState(null, '', url); setDemo(true); }
+  const [demo, setDemo] = useState(() => isDevelopmentDemoRequested(location.search, import.meta.env.DEV));
   async function exit() {
     if (demo) { const url = new URL(location.href); url.searchParams.delete('demo'); history.replaceState(null, '', url); setDemo(false); return true; }
     return auth.signOut();
   }
   if (!auth.ready && !demo) return <div className="boot-state"><Brand /><LoaderCircle className="spin" size={22} /></div>;
-  if (auth.recovering || (!demo && !auth.session)) return <AuthPage key={auth.recovering ? 'recovery' : 'account'} recovering={auth.recovering} onRecovered={auth.finishRecovery} onDemo={enterDemo} sessionError={auth.error} />;
+  if (auth.recovering || (!demo && !auth.session)) return <AuthPage key={auth.recovering ? 'recovery' : 'account'} recovering={auth.recovering} onRecovered={auth.finishRecovery} sessionError={auth.error} />;
   return <Workspace key={demo ? 'demo' : auth.session!.user.id} demo={demo} user={auth.session?.user} onExit={exit} authError={auth.error} />;
 }

@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
 import { Brand } from '../components/Brand';
 import { supabase, authConfigurationError } from '../lib/supabase';
-import { authErrorMessage } from '../lib/errors';
+import { authErrorMessage, isRegisteredEmailError, REGISTERED_EMAIL_MESSAGE } from '../lib/errors';
+import { getSignupOutcome } from '../lib/signup';
+import type { SignupOutcome } from '../lib/signup';
 
 type AuthMode = 'login' | 'signup' | 'reset' | 'recovery';
 interface Props { onDemo(): void; recovering: boolean; onRecovered(): void; sessionError?: string }
@@ -16,14 +18,24 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [signupOutcome, setSignupOutcome] = useState<SignupOutcome | null>(null);
+  const requestPending = useRef(false);
   const titles = { login: '欢迎回来', signup: '创建你的账号', reset: '找回密码', recovery: '设置新密码' };
   const submitLabels = { login: '登录', signup: '注册', reset: '发送重置邮件', recovery: '保存新密码' };
 
-  function changeMode(next: AuthMode) { setMode(next); setError(''); setMessage(''); setPassword(''); }
+  function changeMode(next: AuthMode) {
+    if (next === mode || requestPending.current) return;
+    setMode(next); setError(''); setMessage(''); setPassword(''); setShowPassword(false); setSignupOutcome(null);
+  }
+  function changeEmail(value: string) {
+    setEmail(value); setError(''); setMessage(''); setSignupOutcome(null);
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (requestPending.current) return;
     if (!supabase) { setError(authConfigurationError || '邮箱服务尚未配置。'); return; }
-    setPending(true); setError(''); setMessage('');
+    requestPending.current = true;
+    setPending(true); setError(''); setMessage(''); setSignupOutcome(null);
     try {
       if (mode === 'login') {
         const result = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -31,8 +43,11 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
       } else if (mode === 'signup') {
         const result = await supabase.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: location.origin } });
         if (result.error) throw result.error;
-        if (!result.data.session) setMessage('验证邮件已发送，请在邮箱中完成验证后登录。');
-        setPassword('');
+        const outcome = getSignupOutcome(result.data);
+        setSignupOutcome(outcome);
+        if (outcome === 'existing-account') setError(REGISTERED_EMAIL_MESSAGE);
+        else if (outcome === 'verify-email') setMessage('请查收验证邮件，完成邮箱验证后登录。');
+        else if (outcome === 'unknown') setError('暂时无法确认注册结果，请检查邮箱；已有账号可直接登录或找回密码。');
       } else if (mode === 'reset') {
         const result = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${location.origin}/?auth=recovery` });
         if (result.error) throw result.error;
@@ -42,8 +57,11 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
         if (result.error) throw result.error;
         setPassword(''); onRecovered();
       }
-    } catch (issue) { setError(authErrorMessage(issue)); }
-    finally { setPending(false); }
+    } catch (issue) {
+      setError(authErrorMessage(issue));
+      if (mode === 'signup' && isRegisteredEmailError(issue)) setSignupOutcome('existing-account');
+    }
+    finally { requestPending.current = false; setPending(false); }
   }
 
   return <main className="auth-page">
@@ -59,23 +77,24 @@ export function AuthPage({ onDemo, recovering, onRecovered, sessionError }: Prop
     <section className="auth-panel">
       <div className="auth-mobile-brand"><Brand /></div>
       <div className="auth-form-wrap">
-        {(mode === 'reset') && <button className="text-button auth-back" type="button" onClick={() => changeMode('login')}><ArrowLeft size={16} /> 返回登录</button>}
+        {(mode === 'reset') && <button className="text-button auth-back" type="button" onClick={() => changeMode('login')} disabled={pending}><ArrowLeft size={16} /> 返回登录</button>}
         <h2>{titles[mode]}</h2>
         <p className="auth-subtitle">{mode === 'signup' ? '用邮箱保存你的计划。' : mode === 'reset' ? '我们会发送一封重置邮件。' : mode === 'recovery' ? '为账号设置新的密码。' : '继续你的计划。'}</p>
         {(mode === 'login' || mode === 'signup') && <div className="auth-switch" role="group" aria-label="账号操作">
-          <button type="button" aria-pressed={mode === 'login'} onClick={() => changeMode('login')}>登录</button>
-          <button type="button" aria-pressed={mode === 'signup'} onClick={() => changeMode('signup')}>注册</button>
+          <button type="button" aria-pressed={mode === 'login'} onClick={() => changeMode('login')} disabled={pending}>登录</button>
+          <button type="button" aria-pressed={mode === 'signup'} onClick={() => changeMode('signup')} disabled={pending}>注册</button>
         </div>}
         <form onSubmit={submit}>
-          {mode !== 'recovery' && <label className="field">邮箱<input type="email" name="email" autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} placeholder="you@example.com" required disabled={pending} /></label>}
+          {mode !== 'recovery' && <label className="field">邮箱<input type="email" name="email" autoComplete="email" value={email} onChange={event => changeEmail(event.target.value)} placeholder="you@example.com" required disabled={pending} /></label>}
           {mode !== 'reset' && <label className="field">{mode === 'recovery' ? '新密码' : '密码'}<span className="password-field"><input type={showPassword ? 'text' : 'password'} name="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={event => setPassword(event.target.value)} placeholder={mode === 'login' ? '输入密码' : '至少 8 个字符'} minLength={mode === 'login' ? 1 : 8} required disabled={pending} /><button type="button" className="icon-button" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? '隐藏密码' : '显示密码'}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></span></label>}
-          {mode === 'login' && <div className="auth-forgot"><button className="text-button" type="button" onClick={() => changeMode('reset')}>忘记密码？</button></div>}
+          {mode === 'login' && <div className="auth-forgot"><button className="text-button" type="button" onClick={() => changeMode('reset')} disabled={pending}>忘记密码？</button></div>}
           {(error || sessionError) && <p className="form-error" role="alert">{error || sessionError}</p>}
+          {mode === 'signup' && (signupOutcome === 'existing-account' || signupOutcome === 'unknown') && <div className="auth-alternatives" role="group" aria-label="已有账号操作"><button className="text-button" type="button" onClick={() => changeMode('login')} disabled={pending}>去登录</button><button className="text-button" type="button" onClick={() => changeMode('reset')} disabled={pending}>找回密码</button></div>}
           {message && <p className="form-success" role="status"><Mail size={17} />{message}</p>}
           <button className="button primary auth-submit" type="submit" disabled={pending || !supabase}>{pending ? <LoaderCircle className="spin" size={18} /> : null}{submitLabels[mode]}{!pending && <ArrowRight size={17} />}</button>
         </form>
         {!supabase && <p className="auth-config" role="status">{authConfigurationError}可先体验演示。</p>}
-        {!recovering && <button className="demo-link" type="button" onClick={onDemo}>先体验，不注册 <ArrowRight size={15} /></button>}
+        {!recovering && <button className="demo-link" type="button" onClick={onDemo} disabled={pending}>先体验，不注册 <ArrowRight size={15} /></button>}
       </div>
       <span className="auth-footer">alēthinósplan</span>
     </section>

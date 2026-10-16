@@ -15,6 +15,61 @@ test('unconfigured email service is honest and demo is explicit', async ({ page 
   await expect(page.getByTestId('sticky-task')).toHaveCount(3);
 });
 
+test('account menu closes outside without swallowing navigation or internal actions', async ({ page }) => {
+  await page.goto('/?demo=1');
+  const trigger = page.getByLabel('账号菜单');
+  const popover = page.locator('.account-popover');
+  await trigger.click();
+  await expect(popover).toBeVisible();
+  await page.locator('.account-email').click();
+  await expect(popover).toBeVisible();
+  await page.getByRole('heading', { name: '我的一天.' }).click();
+  await expect(popover).toBeHidden();
+  await trigger.click();
+  await page.getByRole('button', { name: '规划日历', exact: true }).click();
+  await expect(popover).toBeHidden();
+  await expect(page.getByRole('heading', { name: '规划日历.' })).toBeVisible();
+  await trigger.click();
+  await expect(popover).toBeVisible();
+  await trigger.click();
+  await expect(popover).toBeHidden();
+  await trigger.click();
+  await page.getByRole('button', { name: '退出演示 / 登录', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '欢迎回来' })).toBeVisible();
+});
+
+test('account menu supports Escape and closes when keyboard focus leaves', async ({ page }) => {
+  await page.goto('/?demo=1');
+  const trigger = page.getByLabel('账号菜单');
+  const popover = page.locator('.account-popover');
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  await expect(popover).toBeVisible();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: '退出演示 / 登录', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(popover).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await expect(popover).toBeHidden();
+  await expect(page.getByRole('navigation', { name: '主要导航' }).getByRole('button', { name: /我的一天/ })).toBeFocused();
+});
+
+test.describe('account menu on touch screens', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  test('tapping outside dismisses the account popover', async ({ page }) => {
+    await page.goto('/?demo=1');
+    await page.getByLabel('账号菜单').tap();
+    await expect(page.locator('.account-popover')).toBeVisible();
+    await page.locator('.account-email').tap();
+    await expect(page.locator('.account-popover')).toBeVisible();
+    await page.getByRole('heading', { name: '我的一天.' }).tap();
+    await expect(page.locator('.account-popover')).toBeHidden();
+  });
+});
+
 test('sticky task tears, persists, and can be undone', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/?demo=1');

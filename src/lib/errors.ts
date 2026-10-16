@@ -1,4 +1,15 @@
+export const REGISTERED_EMAIL_MESSAGE = '该邮箱已注册，请直接登录，或找回密码。';
+
+export function isRegisteredEmailError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const code = 'code' in error && typeof error.code === 'string' ? error.code : '';
+  if (code === 'user_already_exists' || code === 'email_exists') return true;
+  const message = error instanceof Error ? error.message.toLowerCase() : '';
+  return message.includes('user already registered') || message.includes('email already registered');
+}
+
 export function authErrorMessage(error: unknown): string {
+  if (isRegisteredEmailError(error)) return REGISTERED_EMAIL_MESSAGE;
   const message = error instanceof Error ? error.message.toLowerCase() : '';
   if (message.includes('invalid login')) return '邮箱或密码不正确。';
   if (message.includes('email not confirmed')) return '请先打开验证邮件，完成邮箱验证。';

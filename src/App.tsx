@@ -30,6 +30,28 @@ function Workspace({ demo, user, onExit, authError }: WorkspaceProps) {
   const [toast, setToast] = useState<Toast | null>(null);
   const [undoBusy, setUndoBusy] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const accountMenu = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const dismissOutside = (event: Event) => {
+      const menu = accountMenu.current;
+      if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+    };
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      const menu = accountMenu.current;
+      if (event.key !== 'Escape' || !menu?.open) return;
+      event.preventDefault();
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    };
+    document.addEventListener('pointerdown', dismissOutside, true);
+    document.addEventListener('focusin', dismissOutside, true);
+    document.addEventListener('keydown', dismissOnEscape, true);
+    return () => {
+      document.removeEventListener('pointerdown', dismissOutside, true);
+      document.removeEventListener('focusin', dismissOutside, true);
+      document.removeEventListener('keydown', dismissOnEscape, true);
+    };
+  }, []);
   const focusCompletion = useRef<{ frame: number | null; pending: boolean }>({ frame: null, pending: false });
   useEffect(() => {
     const transition = focusCompletion.current;
@@ -89,7 +111,7 @@ function Workspace({ demo, user, onExit, authError }: WorkspaceProps) {
   }
 
   return <div className="app-shell">
-    <header className="app-topbar"><Brand light /><div className="account-area">{demo && <span className="demo-badge">演示</span>}<details className="account-menu"><summary aria-label="账号菜单"><span className="avatar">{user?.email?.slice(0, 1).toUpperCase() || '我'}</span><ChevronDown size={14} /></summary><div className="account-popover"><span className="account-email">{demo ? '本机演示' : user?.email}</span><button type="button" onClick={() => { setExiting(true); void onExit().finally(() => setExiting(false)); }} disabled={exiting || data.pending.size > 0}><LogOut size={15} />{demo ? '退出演示 / 登录' : '退出登录'}</button></div></details></div></header>
+    <header className="app-topbar"><Brand light /><div className="account-area">{demo && <span className="demo-badge">演示</span>}<details ref={accountMenu} className="account-menu"><summary aria-label="账号菜单"><span className="avatar">{user?.email?.slice(0, 1).toUpperCase() || '我'}</span><ChevronDown size={14} /></summary><div className="account-popover"><span className="account-email">{demo ? '本机演示' : user?.email}</span><button type="button" onClick={() => { setExiting(true); void onExit().finally(() => setExiting(false)); }} disabled={exiting || data.pending.size > 0}><LogOut size={15} />{demo ? '退出演示 / 登录' : '退出登录'}</button></div></details></div></header>
     <aside className="app-sidebar"><span className="sidebar-label">个人空间</span><nav aria-label="主要导航">{nav.map(item => <button type="button" key={item.page} className={page === item.page ? 'nav-item active' : 'nav-item'} aria-current={page === item.page ? 'page' : undefined} onClick={() => { setPage(item.page); setToast(null); }}><item.icon size={18} strokeWidth={1.7} /><span>{item.label}</span>{item.count !== undefined && <small>{item.count}</small>}</button>)}</nav></aside>
     <main className="app-workspace">
       {(data.error || authError) && <div className="error-banner" role="alert"><AlertCircle size={17} /><span>{data.error || authError}</span><button className="text-button" type="button" onClick={() => void data.reload()} disabled={data.pending.size > 0 || data.loading}>重试</button>{data.error && <button type="button" className="icon-button" onClick={data.clearError} aria-label="关闭错误提示"><X size={16} /></button>}</div>}

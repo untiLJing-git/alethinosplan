@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { User } from '@supabase/supabase-js';
-import { AlertCircle, CalendarDays, Check, ChevronDown, LoaderCircle, LogOut, RotateCcw, StickyNote, Sun, X } from 'lucide-react';
+import { AlertCircle, CalendarDays, Check, ChevronDown, LoaderCircle, LogOut, PictureInPicture2, RotateCcw, StickyNote, Sun, X } from 'lucide-react';
+import { DesktopTasks } from './components/DesktopTasks';
+import { useDesktopWindow } from './hooks/useDesktopWindow';
 import { Brand } from './components/Brand';
 import { TaskDialog } from './components/TaskDialog';
 import type { TaskEditorState } from './components/TaskDialog';
@@ -23,6 +26,7 @@ interface WorkspaceProps { demo: boolean; user?: User; onExit(): Promise<boolean
 
 function Workspace({ demo, user, onExit, authError }: WorkspaceProps) {
   const today = useToday();
+  const desktop = useDesktopWindow();
   const repository = useMemo(() => demo ? demoRepository() : cloudRepository(supabase!, user!.id), [demo, user?.id]);
   const data = useTasks(repository);
   const [page, setPage] = useState<Page>('today');
@@ -79,9 +83,9 @@ function Workspace({ demo, user, onExit, authError }: WorkspaceProps) {
     else setToast({ label: saved.status === 'note' ? '已记下' : '已保存' });
     return true;
   }
-  async function complete(task: Task): Promise<boolean> {
+  async function complete(task: Task, animate = true): Promise<boolean> {
     if (task.status !== 'planned') return false;
-    const saved = await data.update(task.id, { status: 'done', completedAt: new Date().toISOString() }, true);
+    const saved = await data.update(task.id, { status: 'done', completedAt: new Date().toISOString() }, animate);
     if (!saved) return false;
     setToast({ label: '已完成', action: async () => Boolean(await data.update(task.id, { status: 'planned', completedAt: null })) });
     return true;
@@ -116,8 +120,10 @@ function Workspace({ demo, user, onExit, authError }: WorkspaceProps) {
     <aside className="app-sidebar"><span className="sidebar-label">个人空间</span><nav aria-label="主要导航">{nav.map(item => <button type="button" key={item.page} className={page === item.page ? 'nav-item active' : 'nav-item'} aria-current={page === item.page ? 'page' : undefined} onClick={() => { setPage(item.page); setToast(null); }}><item.icon size={18} strokeWidth={1.7} /><span>{item.label}</span>{item.count !== undefined && <small>{item.count}</small>}</button>)}</nav></aside>
     <main className="app-workspace">
       {(data.error || authError) && <div className="error-banner" role="alert"><AlertCircle size={17} /><span>{data.error || authError}</span><button className="text-button" type="button" onClick={() => void data.reload()} disabled={data.pending.size > 0 || data.loading}>重试</button>{data.error && <button type="button" className="icon-button" onClick={data.clearError} aria-label="关闭错误提示"><X size={16} /></button>}</div>}
-      {data.loading ? <div className="loading-state" role="status"><LoaderCircle size={25} className="spin" /><span>正在打开计划</span></div> : page === 'today' ? <TodayPage today={today} tasks={data.tasks} pending={data.pending} tearing={data.tearing} onTearEnd={data.finishTear} onCreate={() => setEditor({ date: today, kind: 'plan' })} onEdit={editTask} onFocus={setFocus} onComplete={task => { void complete(task); }} onRestore={task => { void data.update(task.id, { status: 'planned', completedAt: null }).then(saved => { if (saved) setToast({ label: '已恢复到今天' }); }); }} /> : page === 'calendar' ? <CalendarPage today={today} tasks={data.tasks} pending={data.pending} onCreate={date => setEditor({ date, kind: 'plan' })} onEdit={editTask} onMove={move} /> : <NotesPage tasks={data.tasks} pending={data.pending} onCreate={() => setEditor({ date: null, kind: 'note' })} onEdit={editTask} onSchedule={task => setEditor({ task, date: today, kind: 'plan' })} />}
+      {desktop.error && <div className="error-banner" role="alert"><AlertCircle size={17} /><span>{desktop.error}</span><button type="button" className="icon-button" aria-label="关闭小窗提示" onClick={desktop.clearError}><X size={16} /></button></div>}
+      {data.loading ? <div className="loading-state" role="status"><LoaderCircle size={25} className="spin" /><span>正在打开计划</span></div> : page === 'today' ? <TodayPage utility={<button type="button" className="button desktop-window-trigger" onClick={() => void desktop.open()} disabled={desktop.opening} title={desktop.supported ? "以置顶小窗显示今日任务" : "需要支持画中画小窗的桌面浏览器"}><PictureInPicture2 size={17} />{desktop.portal ? "小窗已开启" : "置顶小窗"}</button>} today={today} tasks={data.tasks} pending={data.pending} tearing={data.tearing} onTearEnd={data.finishTear} onCreate={() => setEditor({ date: today, kind: 'plan' })} onEdit={editTask} onFocus={setFocus} onComplete={task => { void complete(task); }} onRestore={task => { void data.update(task.id, { status: 'planned', completedAt: null }).then(saved => { if (saved) setToast({ label: '已恢复到今天' }); }); }} /> : page === 'calendar' ? <CalendarPage today={today} tasks={data.tasks} pending={data.pending} onCreate={date => setEditor({ date, kind: 'plan' })} onEdit={editTask} onMove={move} /> : <NotesPage tasks={data.tasks} pending={data.pending} onCreate={() => setEditor({ date: null, kind: 'note' })} onEdit={editTask} onSchedule={task => setEditor({ task, date: today, kind: 'plan' })} />}
     </main>
+    {desktop.portal && createPortal(<DesktopTasks today={today} tasks={data.tasks} pending={data.pending} loading={data.loading} error={data.error || authError} onCreate={async title => Boolean(await data.create({ title, plannedDate: today, estimate: null, tone: "lemon" }))} onComplete={task => complete(task, false)} onRestore={async task => Boolean(await data.update(task.id, { status: "planned", completedAt: null }))} onReturn={() => { setPage("today"); window.focus(); desktop.close(); }} onClose={desktop.close} />, desktop.portal)}
     {editor && <TaskDialog key={`${editor.task?.id || 'new'}-${editor.kind}`} editor={editor} onClose={() => setEditor(null)} onSave={saveTask} onDelete={removeTask} />}
     {focus && <FocusDialog task={focus} pending={data.pending.has(focus.id)} onClose={() => setFocus(null)} onComplete={completeFromFocus} />}
     {toast && <div className="toast" role="status"><Check size={17} /><span>{toast.label}</span>{toast.action && <button type="button" onClick={() => { setUndoBusy(true); void toast.action!().then(success => { if (success) setToast({ label: '已撤销' }); }).finally(() => setUndoBusy(false)); }} disabled={undoBusy}><RotateCcw size={14} />撤销</button>}<button type="button" className="toast-dismiss" aria-label="关闭提示" onClick={() => setToast(null)}><X size={15} /></button></div>}

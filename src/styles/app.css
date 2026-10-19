@@ -1,5 +1,6 @@
 @import './calendar.css';
 @import './auth.css';
+@import './desktop-window.css';
 
 :root {
   font-family: 'Aptos', 'Microsoft YaHei', 'PingFang SC', sans-serif;

@@ -1,0 +1,29 @@
+.today-actions { display: flex; align-items: center; gap: 10px; }
+.desktop-window-trigger { background: var(--paper); }
+.desktop-window-body { min-width: 260px; margin: 0; background: var(--paper); }
+.desktop-tasks { padding: 22px 20px 16px; color: var(--ink); min-height: 100dvh; background: radial-gradient(ellipse at 0 0, var(--blue-soft), transparent 65%), var(--paper); }
+.desktop-tasks-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.desktop-tasks-heading .eyebrow { font-size: 9px; letter-spacing: 1.8px; }
+.desktop-tasks-heading h1 { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 23px; font-weight: 600; }
+.desktop-tasks-heading h1 svg { color: var(--blue); }
+.desktop-tasks-heading p { margin-top: 7px; color: var(--muted); font-size: 11px; }
+.desktop-tasks-controls { display: flex; }
+.desktop-tasks-summary { display: flex; justify-content: space-between; margin: 24px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.desktop-tasks-summary strong { color: var(--ink); margin-left: 4px; }
+.desktop-tasks-list { padding: 0; margin: 0; list-style: none; display: grid; gap: 10px; }
+.desktop-tasks-list li { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 4px 9px 9px 4px; border-left: 3px solid var(--note-fold); background: var(--note-bg); color: var(--note-ink); }
+.desktop-tasks-list li > div { flex: 1; min-width: 0; }
+.desktop-tasks-list li span { font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.desktop-tasks-list li small { display: block; margin-top: 6px; font-size: 10px; color: var(--note-dim); }
+.desktop-task-check { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 26px; border: 1px solid var(--note-dim); border-radius: 50%; background: transparent; color: var(--note-ink); }
+.desktop-task-check:hover { background: var(--note-fold); }
+.desktop-tasks-empty { color: var(--muted); font-size: 13px; line-height: 1.8; padding: 22px 0; }
+.desktop-tasks-undo { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: var(--muted); }
+.desktop-tasks-add { margin-top: 24px; }
+.desktop-tasks-label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+.desktop-tasks-add > div { display: flex; gap: 8px; }
+.desktop-tasks-add input { flex: 1; width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font-size: 13px; }
+.desktop-tasks-add .button { padding: 10px; }
+.desktop-tasks footer { margin-top: 22px; color: var(--muted); font-size: 10px; line-height: 1.7; }
+.desktop-tasks-error { color: var(--danger); background: var(--paper); padding: 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .today-actions .desktop-window-trigger { display: none; } }

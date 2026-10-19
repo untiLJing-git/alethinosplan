@@ -11,3 +11,11 @@ test-results/
 .wrangler/
 .dev.vars
 .dev.vars.*
+
+# Local database state and exports; keep schema and migrations versioned.
+supabase/.temp/
+supabase/.branches/
+supabase/backups/
+supabase/dumps/
+*.dump
+*.sql.gz

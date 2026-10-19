@@ -1,81 +1,94 @@
-# alēthinósplan
+<p align="center">
+  <img src="docs/assets/hero.svg" alt="alēthinósplan — 从一个念头，到一件完成的事。" width="100%" />
+</p>
 
-> A little plan. A real step.
+<p align="center">
+  <strong>不必填满每一天，先完成一件在意的小事。</strong><br />
+  一个把随手记录、日程安排与专注执行连起来的个人计划应用。
+</p>
 
-个人计划网页应用。React + TypeScript + Vite；账号和云端数据使用 Supabase。
+<p align="center">
+  <a href="https://alethinosplan.pages.dev/">打开应用</a> ·
+  <a href="#功能一览">功能一览</a> ·
+  <a href="#快速开始">快速开始</a> ·
+  <a href="docs/cloudflare-pages.md">自行部署</a> ·
+  <a href="https://github.com/untiLJing-git/realplan/issues">反馈问题</a>
+</p>
 
-## 已实现
+<p align="center"><sub>React · TypeScript · Vite · Supabase · Cloudflare Pages · Apache-2.0</sub></p>
 
-- 每日便利贴任务、完成撕纸动画、撤销、专注计时。
-- 月 / 周日历、桌面拖动改期、日期编辑、任务新增和删除。
-- 独立「随手记」入口：先记录，明确安排日期后才进入日历。
-- 邮箱密码注册、验证邮件、登录、退出、密码重置与会话恢复。
-- 移动端布局、键盘操作、减少动态效果、明暗外观。
-- 登录 / 注册页提供固定示例的产品动效预览，不读取或写入真实任务。
-- 开发环境保留本机演示；正式页面不提供体验入口，生产构建不接受 `?demo=1`。演示数据不会自动导入真实账号。
+---
 
-## 本地启动
+## 看它如何工作
 
-使用 Node.js 22.12+ 或 24 LTS；本项目已在 Node.js 24 上验证。
+![alēthinósplan 实际界面演示：完成任务、查看日历、记录想法和进入专注](docs/assets/demo.gif)
+
+<p align="center"><sub>使用本地示例数据录制，不含真实账号或用户任务。<a href="docs/assets/overview.png">查看静态截图</a></sub></p>
+
+## 功能一览
+
+| 从这里开始 | 可以做什么 |
+| --- | --- |
+| **我的一天** | 用彩色便利贴安排今日任务；完成时撕下便签，也能撤销恢复。 |
+| **规划日历** | 在月／周视图中安排计划，通过日期编辑或桌面拖动调整日程。 |
+| **随手记** | 先捕捉念头，不急着定日期；想清楚后再安排到日历。 |
+| **专注一件事** | 从任务进入计时，暂停、继续，或完成后返回计划。 |
+| **置顶小窗** | 在支持的桌面浏览器中，浮动查看今日待办，直接新增、完成和撤销。 |
+| **自己的节奏** | 支持移动端布局、明暗外观与减少动态效果；邮箱账号保存个人计划。 |
+
+## 把今天留在手边
+
+<p align="center"><img src="docs/assets/desktop-window.png" alt="今日任务小窗，包含待办列表、完成按钮及新增输入框" width="320" /></p>
+
+在「我的一天」点击 **置顶小窗**，不必反复切回整个任务看板。小窗和主页面共用任务状态，改动即时反映到另一处。
+
+> 小窗依赖桌面浏览器的 Document Picture-in-Picture 支持。它不是独立桌面程序：关闭主页面或退出账号后会关闭，也不提供开机自启、系统托盘或固定屏幕坐标。手机端不显示此入口。[查看支持范围与使用说明 →](docs/desktop-window.md)
+
+## 快速开始
+
+正式站点：[alethinosplan.pages.dev](https://alethinosplan.pages.dev/)。使用邮箱注册、验证后登录；线上版本不开放免注册演示入口。
+
+想先在本地看看效果？使用 Node.js 24.12.0，克隆项目后运行：
 
 ```sh
+git clone https://github.com/untiLJing-git/realplan.git
+cd realplan
 npm ci
 npm run dev
 ```
 
-本地地址：`http://127.0.0.1:5173`。开发调试时可直接打开 `http://127.0.0.1:5173/?demo=1`，不配置服务也能验证任务流程。此参数仅在 Vite 开发环境有效，生产构建仍要求登录。
+打开 `http://127.0.0.1:5173/?demo=1` 即可体验本地示例，无需配置 Supabase。演示数据只保存在当前浏览器，不会写入真实账号；生产构建禁用此入口。
 
-首页预览在桌面轮换展示「我的一天 → 规划日历 → 随手记」，当前界面始终位于叠层最前方。展示区与标题保持适度间距，不随高屏剩余空间过度下移，不显示示例标签或底部步骤文字；暂不显示播放／暂停按钮，保留自动轮播。开始填写表单、切走页面或启用减少动态效果时暂停并保留当前界面，移动端使用紧凑静态展示。设计依据与取舍见 `docs/product-preview.md`。
+连接自己的账号服务时，将 [.env.example](.env.example) 复制为 `.env.local`，填写 Supabase 项目地址与 **publishable key**，然后按 [开发与自托管指南](docs/development.md) 配置认证和数据库。
 
-## 开启真实邮箱账号与云端保存
-
-1. 创建一个 Supabase 项目，在 SQL Editor 执行 `supabase/schema.sql`。该脚本创建任务表、约束、索引以及每个用户只能访问自己任务的 RLS 策略。
-2. 将 `.env.example` 复制为 `.env.local`，填写项目 URL 和 **publishable key**。不要填写 `secret` 或 `service_role` 密钥。`.env.local` 已被 Git 忽略。
-3. 在 Supabase Authentication 中启用 Email provider，开启 Confirm email；将最小密码长度配置为至少 8。
-4. 设置 Site URL，并将实际开发/部署地址加入 Redirect URLs。开发时加入 `http://127.0.0.1:5173/**` 和实际使用的 localhost 地址；生产环境使用自己的 HTTPS 域名。密码重置返回 `/?auth=recovery`。
-5. 面向真实用户发送验证/重置邮件时，配置自有 SMTP。Supabase 默认邮件服务有收件人及发送限制，不应作为生产邮件服务。SMTP 密码只填写在服务端控制台，不要放入前端环境变量。
-6. 重启 `npm run dev`。注册真实邮箱并完成验证，然后确认登录、退出、密码重置和跨设备读取任务均正常。
-
-注册和密码重置使用 PKCE：应在发起操作的同一浏览器打开邮件链接。生产环境还需要根据实际部署配置发送域名、邮件投递、限流、验证码和备份策略。
-
-自动化账号测试使用受控的 HTTP 模拟响应，不代表真实邮件投递或云端配置已经验证。上线前务必使用两个不同账号验证数据隔离，且在未登录状态下不能读取任务。
-
-官方参考：
-- https://supabase.com/docs/guides/auth/passwords
-- https://supabase.com/docs/guides/auth/auth-smtp
-- https://supabase.com/docs/guides/auth/redirect-urls
-- https://supabase.com/docs/guides/database/postgres/row-level-security
-
-## 验证与构建
+## 开发与部署
 
 ```sh
-npm run check
-npm test
-npm run test:e2e
-npm run build
+npm run check         # TypeScript 检查
+npm test              # 任务规则与部署配置测试
+npm run test:e2e      # 页面交互、认证与小窗回归
+npm run build:pages   # 检查环境并构建生产文件
+npm run test:pages    # Pages 本地托管验收
 ```
 
-浏览器测试优先使用 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`，Windows 上也会寻找已安装的 Chrome；其他环境可以先运行 `npx playwright install chromium`。
+| 想了解什么 | 从这里阅读 |
+| --- | --- |
+| 本地开发、账号配置、演示素材录制 | [开发指南](docs/development.md) |
+| Pages 构建、环境变量、认证回跳 | [部署指南](docs/cloudflare-pages.md) |
+| 小窗能力、兼容性与限制 | [小窗说明](docs/desktop-window.md) |
+| 数据结构与用户隔离 | [数据库说明](supabase/README.md) · [SQL 定义](supabase/schema.sql) |
 
-`npm run build` 输出 `dist/`，可部署到支持静态站点的服务。环境变量在构建时注入，修改后需要重新构建。所有路由均在应用根路径内切换，邮件回跳使用查询参数。
+## 数据与边界
 
-## 部署到 Cloudflare Pages
+- 正式账号的计划通过 Supabase 保存；仓库中的 SQL 只定义结构与 RLS 策略，不包含用户数据。
+- 不要将服务端密钥、数据库密码或数据备份提交到仓库；`VITE_*` 会进入前端构建，只能放公开客户端配置。
+- 云端同步需要网络；当前不是完整的离线应用，也不承诺所有浏览器都支持桌面置顶。
+- 自行部署前，请验证真实邮件投递、认证回跳和账号间数据隔离。自动化测试不等于生产安全审计。
 
-Pages 指南见 [docs/cloudflare-pages.md](docs/cloudflare-pages.md)。前端功能和 Supabase 数据无需迁移。
+## 反馈与许可
 
-- 创建 Pages 项目，连接 Git 仓库；项目根目录保持仓库根目录。
-- 构建命令：`npm run build:pages`；输出目录：`dist`。Git 集成自动发布构建产物，无需额外部署命令。
-- Production 构建变量：`VITE_SUPABASE_URL`、`VITE_SUPABASE_PUBLISHABLE_KEY`，Node 使用 `24.12.0`。Preview 环境也需要单独确认变量。
-- 本地预览：`npm run preview:pages`；Pages 验收：`npm run test:pages`。
-- 如需手动发布，登录 Wrangler 后使用 `npm run deploy:pages`，项目名以 `wrangler.jsonc` 中的 `name` 为准。
-- Pages 正式域名确定后，更新 Supabase Site URL 和邮件回跳白名单；不要修改 Supabase API URL 或密钥。
+欢迎通过 [Issues](https://github.com/untiLJing-git/realplan/issues) 提交问题和建议。描述复现步骤、浏览器与设备即可，请勿附带密码、访问令牌或私人任务内容。
 
-## 目录
+项目代码采用 [Apache License 2.0](LICENSE)。
 
-- `src/components/`：便利贴、编辑弹窗、专注界面。
-- `src/pages/`：今天、日历、随手记、账号页面。
-- `src/lib/`：日期与任务规则、演示/云端存储、Supabase 配置。
-- `supabase/schema.sql`：数据库与用户隔离策略。
-- `tests/`：浏览器端交互与邮箱账号流程测试。
-
-日历使用浏览器本地日期，完成时间使用 UTC 时间戳。动画只是状态反馈，不代表此界面已经获得行为科学有效性验证。
+<p align="center"><sub>A little plan. A real step.</sub></p>

@@ -60,7 +60,7 @@ python scripts/render-demo.py
 
 录制需要桌面 Chrome 或支持 Document Picture-in-Picture 的 Chromium；GIF 渲染需要 Python 和 Pillow（`python -m pip install Pillow`）。录制脚本自行启动 127.0.0.1:5181 的开发服务，使用全新的浏览器环境和固定演示日期，并阻断外网请求；不会读取真实账号或任务。
 
-输出文件为 docs/assets/demo.gif、overview.png 和 desktop-window.png；中间帧放在被忽略的 .test-readme-frames 目录。发布前应检查每张截图与动画，勿用真实用户数据录制素材。
+输出文件为 docs/assets/demo.gif、overview.png、desktop-window.png 和 desktop-focus.png；中间帧放在被忽略的 .test-readme-frames 目录。发布前应检查每张截图与动画，勿用真实用户数据录制素材。
 
 ## 代码导览
 

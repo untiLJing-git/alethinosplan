@@ -14,12 +14,19 @@ export function DesktopContextMenu({ state, actions, onDismiss }: Props) {
   const theme = useTheme();
   const root = useRef<HTMLDivElement>(null);
   const [point, setPoint] = useState({ x: state.x, y: state.y });
+  const scrollPositions = useRef(new Map<EventTarget, { top: number; left: number }>());
   const dismiss = useRef(onDismiss);
   dismiss.current = onDismiss;
   useLayoutEffect(() => {
     const element = root.current!;
     const win = element.ownerDocument.defaultView!;
     const box = element.getBoundingClientRect();
+    scrollPositions.current.clear();
+    for (let ancestor: HTMLElement | null = state.anchor; ancestor; ancestor = ancestor.parentElement) {
+      scrollPositions.current.set(ancestor, { top: ancestor.scrollTop, left: ancestor.scrollLeft });
+    }
+    const doc = element.ownerDocument;
+    scrollPositions.current.set(doc, { top: doc.scrollingElement?.scrollTop || 0, left: doc.scrollingElement?.scrollLeft || 0 });
     setPoint({ x: Math.max(8, Math.min(state.x, win.innerWidth - box.width - 8)), y: Math.max(8, Math.min(state.y, win.innerHeight - box.height - 8)) });
     element.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus({ preventScroll: true });
   }, [state]);
@@ -28,6 +35,13 @@ export function DesktopContextMenu({ state, actions, onDismiss }: Props) {
     const doc = element.ownerDocument;
     const win = doc.defaultView!;
     const outside = (event: Event) => { if (!element.contains(event.target as Node)) dismiss.current(false); };
+    // Ignore a queued scroll event from revealing the anchor before this menu opened.
+    const scrolled = (event: Event) => {
+      if (element.contains(event.target as Node)) return;
+      const target = event.target === doc ? doc.scrollingElement : event.target as Element;
+      const previous = scrollPositions.current.get(event.target!);
+      if (!target || !previous || previous.top !== target.scrollTop || previous.left !== target.scrollLeft) dismiss.current(false);
+    };
     const hide = () => dismiss.current(false);
     const keys = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); dismiss.current(true); return; }
@@ -42,11 +56,11 @@ export function DesktopContextMenu({ state, actions, onDismiss }: Props) {
       event.preventDefault(); items[index]?.focus();
     };
     doc.addEventListener('pointerdown', outside);
-    doc.addEventListener('scroll', outside, true);
+    doc.addEventListener('scroll', scrolled, true);
     doc.addEventListener('keydown', keys);
     win.addEventListener('resize', hide);
     win.addEventListener('blur', hide);
-    return () => { doc.removeEventListener('pointerdown', outside); doc.removeEventListener('scroll', outside, true); doc.removeEventListener('keydown', keys); win.removeEventListener('resize', hide); win.removeEventListener('blur', hide); };
+    return () => { doc.removeEventListener('pointerdown', outside); doc.removeEventListener('scroll', scrolled, true); doc.removeEventListener('keydown', keys); win.removeEventListener('resize', hide); win.removeEventListener('blur', hide); };
   }, []);
   return <div ref={root} className="desktop-context-menu" role="menu" aria-label="小窗操作" style={{ left: point.x, top: point.y }}>
     <div className="desktop-menu-label">今日小窗</div>

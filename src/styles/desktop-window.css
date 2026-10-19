@@ -50,3 +50,41 @@
 
 .desktop-tasks-heading, .desktop-tasks-tabs, .desktop-tasks-undo, .desktop-tasks-error { flex-shrink: 0; }
 #desktop-task-panel { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+
+.desktop-task-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.desktop-task-meta small { margin-top: 0; }
+.desktop-task-start { display: inline-flex; align-items: center; gap: 4px; min-height: 25px; padding: 3px 7px; border: 0; border-radius: 4px; background: color-mix(in srgb, var(--paper) 35%, transparent); color: var(--note-ink); font-size: 10px; white-space: nowrap; }
+.desktop-task-start:hover:not(:disabled) { background: var(--note-fold); }
+.desktop-focus-card { margin-bottom: 14px; padding: 10px 14px 14px; border: 1px solid var(--note-fold); border-radius: 10px; background: linear-gradient(130deg, var(--paper), color-mix(in srgb, var(--note-bg) 40%, var(--paper))); }
+.desktop-focus-caption { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 10px; }
+.desktop-focus-caption .icon-button { min-width: 28px; min-height: 28px; }
+.desktop-focus-card h2 { font-size: 14px; line-height: 1.6; font-weight: 500; overflow-wrap: anywhere; }
+.desktop-focus-card .focus-clock { margin: 10px 0 12px; font-size: 36px; letter-spacing: -1px; }
+.desktop-focus-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+.desktop-focus-controls .button { min-height: 32px; padding: 7px 10px; font-size: 11px; }
+.active-focus-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--blue-soft); }
+.active-focus-title { flex: 1; min-width: 0; }
+.active-focus-title small { display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; }
+.active-focus-title strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+.active-focus-bar .focus-clock { flex-shrink: 0; margin: 0; font-size: 25px; letter-spacing: -.6px; }
+.active-focus-actions { display: flex; align-items: center; gap: 8px; }
+.active-focus-actions .text-button { font-size: 11px; }
+.focus-dialog .focus-dock { margin: 18px auto 0; font-size: 12px; }
+@media (max-width: 760px) { .focus-dialog .focus-dock { display: none; } }
+@media (max-width: 520px) { .active-focus-bar { flex-wrap: wrap; gap: 10px; } .active-focus-actions { width: 100%; justify-content: flex-end; } }
+
+@media (max-height: 520px) {
+  .desktop-focus-card { padding: 8px 12px 6px; }
+  .desktop-focus-caption .icon-button { min-height: 24px; min-width: 24px; }
+  .desktop-focus-card .focus-clock { margin: 6px 0 8px; font-size: 30px; }
+  .desktop-focus-controls .button { min-height: 30px; padding: 6px 9px; }
+}
+
+.desktop-tasks.is-focusing .desktop-tasks-heading .eyebrow { display: none; }
+.desktop-tasks.is-focusing .desktop-tasks-heading h1 { margin-top: 0; }
+.desktop-tasks.is-focusing .desktop-tasks-tabs { margin-top: 14px; margin-bottom: 12px; }
+.desktop-tasks.is-focusing .desktop-tasks-add { margin-top: 10px; }
+@media (max-height: 520px) {
+  .desktop-tasks.is-focusing .desktop-tasks-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .desktop-tasks.is-focusing .desktop-tasks-footer { padding-top: 8px; }
+}

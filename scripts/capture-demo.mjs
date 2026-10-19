@@ -62,6 +62,9 @@ try {
     await mini.setViewportSize({ width: 380, height: 560 });
     await mini.getByRole('heading', { name: '我的一天', exact: true }).waitFor();
     await mini.screenshot({ path: 'docs/assets/desktop-window.png' });
+    await mini.getByRole('button', { name: /^开始计时：/ }).first().click();
+    await mini.waitForTimeout(1200);
+    await mini.screenshot({ path: 'docs/assets/desktop-focus.png' });
     await mini.close();
   } else {
     throw new Error('This browser cannot capture the native desktop window.');

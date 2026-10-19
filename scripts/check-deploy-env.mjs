@@ -6,7 +6,7 @@ export function validateDeploymentEnv(env) {
   const url = env.VITE_SUPABASE_URL?.trim();
   const key = env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
   if (!url || !key || /YOUR_PROJECT/i.test(url) || /YOUR_PUBLISHABLE/i.test(key)) {
-    throw new Error('Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY before building for Workers.');
+    throw new Error('Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY before building for deployment.');
   }
   let parsed;
   try { parsed = new URL(url); } catch { throw new Error('VITE_SUPABASE_URL must be a valid HTTPS URL.'); }
@@ -28,7 +28,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   try {
     // Match Vite production mode, including .env.local and existing process variables.
     validateDeploymentEnv(loadEnv('production', process.cwd(), 'VITE_'));
-    console.log('Workers build environment is valid. No credentials were printed.');
+    console.log('Deployment build environment is valid. No credentials were printed.');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

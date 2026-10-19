@@ -30,6 +30,6 @@
     "vitest.config.ts",
     "playwright.config.ts",
     "tests",
-    "playwright.workers.config.ts"
+    "playwright.pages.config.ts"
   ]
 }

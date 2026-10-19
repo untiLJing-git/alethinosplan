@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('https://alethinos-test.supabase.co/**', route => route.abort());
 });
 
-test('Workers serves the built app and keeps development demo disabled', async ({ page }) => {
+test('Pages serves the built app and keeps development demo disabled', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   const response = await page.goto('/?demo=1');
@@ -14,7 +14,7 @@ test('Workers serves the built app and keeps development demo disabled', async (
   await expect(page.locator('.app-shell')).toHaveCount(0);
   await expect(page.locator('.product-preview button')).toHaveCount(0);
   expect(errors).toEqual([]);
-  await page.screenshot({ path: 'test-results/workers-auth.png', fullPage: true });
+  await page.screenshot({ path: 'test-results/pages-auth.png', fullPage: true });
 });
 
 test('SPA navigation and authentication query parameters survive direct navigation and refresh', async ({ page }) => {
@@ -28,7 +28,7 @@ test('SPA navigation and authentication query parameters survive direct navigati
   }
 });
 
-test('Workers applies security headers and immutable caching only to fingerprinted assets', async ({ request }) => {
+test('Pages applies security headers and immutable caching only to fingerprinted assets', async ({ request }) => {
   const root = await request.get('/');
   expect(root.status()).toBe(200);
   expect(root.headers()['x-content-type-options']).toBe('nosniff');

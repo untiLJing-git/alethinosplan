@@ -59,15 +59,16 @@ npm run build
 
 `npm run build` 输出 `dist/`，可部署到支持静态站点的服务。环境变量在构建时注入，修改后需要重新构建。所有路由均在应用根路径内切换，邮件回跳使用查询参数。
 
-## 部署到 Cloudflare Workers
+## 部署到 Cloudflare Pages
 
-已配置 Workers Static Assets，无需新增后端服务。部署指南见 [docs/cloudflare-workers.md](docs/cloudflare-workers.md)。
+Pages 指南见 [docs/cloudflare-pages.md](docs/cloudflare-pages.md)。前端功能和 Supabase 数据无需迁移。
 
-- 控制台构建命令：`npm run build:workers`；部署命令：`npx wrangler deploy`。
-- 在构建变量中填写 `VITE_SUPABASE_URL` 与 `VITE_SUPABASE_PUBLISHABLE_KEY`；不要只设置 Worker 运行时变量。
-- 本地预检：`npm run deploy:dry-run`；本地 Workers 验收：`npm run test:workers`。
-- 本地预览：`npm run preview:workers`；确认账号权限后发布：`npm run deploy`。
-- 部署前按实际 HTTPS 域名配置 Supabase Site URL 和邮件 Redirect URLs，不需要改动现有任务数据。
+- 创建 Pages 项目，连接 Git 仓库；项目根目录保持仓库根目录。
+- 构建命令：`npm run build:pages`；输出目录：`dist`。Git 集成自动发布构建产物，无需额外部署命令。
+- Production 构建变量：`VITE_SUPABASE_URL`、`VITE_SUPABASE_PUBLISHABLE_KEY`，Node 使用 `24.12.0`。Preview 环境也需要单独确认变量。
+- 本地预览：`npm run preview:pages`；Pages 验收：`npm run test:pages`。
+- 如需手动发布，登录 Wrangler 后使用 `npm run deploy:pages`，项目名以 `wrangler.jsonc` 中的 `name` 为准。
+- Pages 正式域名确定后，更新 Supabase Site URL 和邮件回跳白名单；不要修改 Supabase API URL 或密钥。
 
 ## 目录
 

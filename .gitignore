@@ -1,6 +1,6 @@
 node_modules/
 dist/
-.test-build/
+.test-*/
 .env
 .env.*
 !.env.example
@@ -11,4 +11,3 @@ test-results/
 .wrangler/
 .dev.vars
 .dev.vars.*
-.test-workers/

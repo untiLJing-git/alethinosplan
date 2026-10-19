@@ -12,11 +12,10 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check:deploy-env": "node scripts/check-deploy-env.mjs",
-    "build:workers": "npm run check:deploy-env && node scripts/clean-dist.mjs && npm run build",
-    "preview:workers": "npm run build:workers && wrangler dev --local --ip 127.0.0.1 --port 8787",
-    "deploy:dry-run": "npm run build:workers && wrangler deploy --dry-run",
-    "deploy": "npm run build:workers && wrangler deploy",
-    "test:workers": "playwright test --config playwright.workers.config.ts"
+    "build:pages": "npm run check:deploy-env && node scripts/clean-dist.mjs && npm run build",
+    "preview:pages": "npm run build:pages && wrangler pages dev dist --ip 127.0.0.1 --port 8789",
+    "deploy:pages": "npm run build:pages && wrangler pages deploy dist",
+    "test:pages": "playwright test --config playwright.pages.config.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.3",

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { mirrorDesktopTheme } from '../lib/desktopTheme';
 
 interface DocumentPictureInPicture {
   requestWindow(options: { width: number; height: number }): Promise<Window>;
@@ -11,12 +12,14 @@ export function useDesktopWindow() {
   const [error, setError] = useState('');
   const current = useRef<Window | null>(null);
   const busy = useRef(false);
+  const stopTheme = useRef<(() => void) | null>(null);
   const active = useRef(false);
   const generation = useRef(0);
   const supported = window.isSecureContext && typeof api()?.requestWindow === 'function';
 
   const close = useCallback(() => {
     generation.current += 1;
+    stopTheme.current?.(); stopTheme.current = null;
     current.current?.close();
     current.current = null;
     if (active.current) setPortal(null);
@@ -37,7 +40,7 @@ export function useDesktopWindow() {
     const version = generation.current;
     let child: Window | null = null;
     try {
-      child = await api()!.requestWindow({ width: 380, height: 520 });
+      child = await api()!.requestWindow({ width: 380, height: 560 });
       // A pending request must not reopen private content after logout or navigation.
       if (!active.current || version !== generation.current) { child.close(); return; }
       const doc = child.document;
@@ -49,17 +52,20 @@ export function useDesktopWindow() {
         if (source instanceof HTMLLinkElement) clone.setAttribute('href', source.href);
         doc.head.append(clone);
       });
+      stopTheme.current = mirrorDesktopTheme(doc);
       const root = doc.createElement('div');
       doc.body.append(root);
       current.current = child;
       const opened = child;
       child.addEventListener('pagehide', () => {
         if (current.current !== opened) return;
+        stopTheme.current?.(); stopTheme.current = null;
         current.current = null;
         if (active.current) setPortal(null);
       }, { once: true });
       setPortal(root);
     } catch {
+      stopTheme.current?.(); stopTheme.current = null;
       child?.close();
       if (active.current && version === generation.current) setError('未能打开置顶小窗。请检查浏览器支持情况，再点击重试。');
     } finally {

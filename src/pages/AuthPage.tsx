@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
+import { FeedbackLink } from '../components/FeedbackLink';
 import { Brand } from '../components/Brand';
 import { ProductPreview } from '../components/ProductPreview';
 import { supabase, authConfigurationError } from '../lib/supabase';
@@ -100,7 +101,7 @@ export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
         </form>
         {!supabase && <p className="auth-config" role="status">{authConfigurationError}</p>}
       </div>
-      <span className="auth-footer">alēthinósplan</span>
+      <footer className="auth-footer"><span>alēthinósplan</span><FeedbackLink compact /></footer>
     </section>
   </main>;
 }

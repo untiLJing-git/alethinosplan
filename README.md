@@ -12,7 +12,7 @@
   <a href="#功能一览">功能一览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="docs/cloudflare-pages.md">自行部署</a> ·
-  <a href="https://github.com/untiLJing-git/realplan/issues">反馈问题</a>
+  <a href="https://github.com/untiLJing-git/realplan/issues/new/choose">提交反馈</a>
 </p>
 
 <p align="center"><sub>React · TypeScript · Vite · Supabase · Cloudflare Pages · Apache-2.0</sub></p>
@@ -33,8 +33,8 @@
 | **规划日历** | 在月／周视图中安排计划，通过日期编辑或桌面拖动调整日程。 |
 | **随手记** | 先捕捉念头，不急着定日期；想清楚后再安排到日历。 |
 | **专注一件事** | 从任务进入计时，暂停、继续，或完成后返回计划。 |
-| **置顶小窗** | 在支持的桌面浏览器中，浮动查看今日待办，直接新增、完成和撤销。 |
-| **自己的节奏** | 支持移动端布局、明暗外观与减少动态效果；邮箱账号保存个人计划。 |
+| **置顶小窗** | 在支持的桌面浏览器中，切换查看待完成／已完成，直接新增、完成、恢复和跨窗口撤销。 |
+| **自己的节奏** | 支持浅色／深色／跟随系统、移动端布局与减少动态效果；邮箱账号保存个人计划。 |
 
 ## 把今天留在手边
 
@@ -76,6 +76,8 @@ npm run test:pages    # Pages 本地托管验收
 | 本地开发、账号配置、演示素材录制 | [开发指南](docs/development.md) |
 | Pages 构建、环境变量、认证回跳 | [部署指南](docs/cloudflare-pages.md) |
 | 小窗能力、兼容性与限制 | [小窗说明](docs/desktop-window.md) |
+| 外观偏好、小窗右键操作 | [主题与菜单](docs/theme.md) |
+| 反馈入口与公开提交说明 | [反馈说明](docs/feedback.md) |
 | 数据结构与用户隔离 | [数据库说明](supabase/README.md) · [SQL 定义](supabase/schema.sql) |
 
 ## 数据与边界
@@ -87,7 +89,7 @@ npm run test:pages    # Pages 本地托管验收
 
 ## 反馈与许可
 
-欢迎通过 [Issues](https://github.com/untiLJing-git/realplan/issues) 提交问题和建议。描述复现步骤、浏览器与设备即可，请勿附带密码、访问令牌或私人任务内容。
+桌面端可从左侧栏底部「反馈与建议」进入；移动端位于账号菜单，登录页底部也有入口。也可直接 [提交反馈](https://github.com/untiLJing-git/realplan/issues/new/choose)，选择问题反馈或功能建议；提交前可先 [查看已有 Issues](https://github.com/untiLJing-git/realplan/issues)。描述复现步骤、浏览器与设备即可，请勿附带密码、访问令牌或私人任务内容。
 
 项目代码采用 [Apache License 2.0](LICENSE)。
 

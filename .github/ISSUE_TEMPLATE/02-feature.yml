@@ -1,0 +1,25 @@
+name: 功能建议
+description: 提出新功能或现有体验的改进建议。
+title: "[建议] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        欢迎分享使用中的想法。请先搜索是否已有相同建议。
+        **Issue 是公开的，请不要附带私人任务、账号信息或密钥。**
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 希望增加或改进什么？
+      description: 描述你希望看到的行为或体验。
+    validations:
+      required: true
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景（可选）
+      description: 这个改进会在什么情况下帮到你？
+  - type: textarea
+    id: examples
+    attributes:
+      label: 补充说明或参考（可选）

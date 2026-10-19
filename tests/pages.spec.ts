@@ -13,6 +13,7 @@ test('Pages serves the built app and keeps development demo disabled', async ({ 
   await expect(page.locator('.auth-submit')).toBeEnabled();
   await expect(page.locator('.app-shell')).toHaveCount(0);
   await expect(page.locator('.product-preview button')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /反馈与建议/ })).toHaveAttribute('href', 'https://github.com/untiLJing-git/realplan/issues/new/choose');
   expect(errors).toEqual([]);
   await page.screenshot({ path: 'test-results/pages-auth.png', fullPage: true });
 });
@@ -45,4 +46,20 @@ test('Pages applies security headers and immutable caching only to fingerprinted
     expect(asset.headers()['cache-control']).toBe('public, max-age=31536000, immutable');
     expect(asset.headers()['content-type']).not.toContain('text/html');
   }
+});
+
+
+test('Pages serves the theme bootstrap and preserves a saved manual theme in production', async ({ page, request }) => {
+  const script = await request.get('/theme-init.js');
+  expect(script.status()).toBe(200);
+  expect(script.headers()['content-type']).not.toContain('text/html');
+  expect(await script.text()).toContain('alethinosplan.theme.v1');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.addInitScript(() => localStorage.setItem('alethinosplan.theme.v1', 'dark'));
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: '欢迎回来' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveCSS('color-scheme', 'dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });

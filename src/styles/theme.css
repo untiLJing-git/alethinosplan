@@ -1,0 +1,18 @@
+.theme-switcher { margin-top: auto; padding: 16px 4px 0; }
+.theme-toggle { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 10px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 12px; text-align: left; }
+.theme-toggle:hover { background: var(--blue-soft); color: var(--blue); }
+.theme-save-note { margin: 8px 8px 0; color: var(--muted); font-size: 10px; line-height: 1.7; }
+@media (max-width: 760px) {
+  .theme-switcher { position: fixed; left: max(14px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom)); z-index: 20; margin: 0; padding: 0; }
+  .theme-toggle { width: auto; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line); background: var(--paper); box-shadow: 0 2px 8px var(--shadow); }
+  .theme-save-note { position: absolute; bottom: 48px; left: 0; width: min(260px, calc(100vw - 28px)); margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); }
+  .app-shell .toast { bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+.desktop-context-menu { position: fixed; z-index: 100; width: 220px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; padding: 7px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); box-shadow: 0 10px 28px #13213b30; }
+.desktop-menu-label { padding: 5px 9px; font-size: 10px; color: var(--muted); letter-spacing: .5px; }
+.desktop-context-menu button { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 33px; padding: 7px 9px; border: 0; border-radius: 5px; background: transparent; color: var(--ink); font-size: 12px; text-align: left; }
+.desktop-context-menu button > span { flex: 1; }
+.desktop-context-menu button:hover, .desktop-context-menu button:focus-visible { background: var(--blue-soft); color: var(--blue); outline: none; }
+.desktop-context-menu button[aria-checked='true'] { color: var(--blue); }
+.desktop-menu-divider { height: 1px; margin: 6px 4px; background: var(--line); }
+.desktop-menu-hint { display: block; padding: 9px 9px 5px; color: var(--muted); font-size: 9px; }

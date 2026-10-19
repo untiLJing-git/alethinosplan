@@ -1,15 +1,13 @@
 .today-actions { display: flex; align-items: center; gap: 10px; }
 .desktop-window-trigger { background: var(--paper); }
 .desktop-window-body { min-width: 260px; margin: 0; background: var(--paper); }
-.desktop-tasks { padding: 22px 20px 16px; color: var(--ink); min-height: 100dvh; background: radial-gradient(ellipse at 0 0, var(--blue-soft), transparent 65%), var(--paper); }
+.desktop-tasks { display: flex; flex-direction: column; padding: 22px 20px 16px; color: var(--ink); height: 100dvh; min-height: 360px; background: radial-gradient(ellipse at 0 0, var(--blue-soft), transparent 65%), var(--paper); }
 .desktop-tasks-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .desktop-tasks-heading .eyebrow { font-size: 9px; letter-spacing: 1.8px; }
 .desktop-tasks-heading h1 { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 23px; font-weight: 600; }
 .desktop-tasks-heading h1 svg { color: var(--blue); }
 .desktop-tasks-heading p { margin-top: 7px; color: var(--muted); font-size: 11px; }
 .desktop-tasks-controls { display: flex; }
-.desktop-tasks-summary { display: flex; justify-content: space-between; margin: 24px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
-.desktop-tasks-summary strong { color: var(--ink); margin-left: 4px; }
 .desktop-tasks-list { padding: 0; margin: 0; list-style: none; display: grid; gap: 10px; }
 .desktop-tasks-list li { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 4px 9px 9px 4px; border-left: 3px solid var(--note-fold); background: var(--note-bg); color: var(--note-ink); }
 .desktop-tasks-list li > div { flex: 1; min-width: 0; }
@@ -18,12 +16,37 @@
 .desktop-task-check { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 26px; border: 1px solid var(--note-dim); border-radius: 50%; background: transparent; color: var(--note-ink); }
 .desktop-task-check:hover { background: var(--note-fold); }
 .desktop-tasks-empty { color: var(--muted); font-size: 13px; line-height: 1.8; padding: 22px 0; }
-.desktop-tasks-undo { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: var(--muted); }
-.desktop-tasks-add { margin-top: 24px; }
+.desktop-tasks-undo { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); }
+.desktop-tasks-undo > div { min-width: 0; }
+.desktop-tasks-undo small { display: block; font-size: 10px; }
+.desktop-tasks-undo span { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-top: 3px; font-size: 11px; }
+.desktop-tasks-undo .text-button { flex-shrink: 0; font-size: 11px; }
+.desktop-tasks-add { flex-shrink: 0; margin-top: 16px; }
 .desktop-tasks-label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 8px; }
 .desktop-tasks-add > div { display: flex; gap: 8px; }
 .desktop-tasks-add input { flex: 1; width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font-size: 13px; }
 .desktop-tasks-add .button { padding: 10px; }
-.desktop-tasks footer { margin-top: 22px; color: var(--muted); font-size: 10px; line-height: 1.7; }
+.desktop-tasks-footer { flex-shrink: 0; margin-top: auto; padding-top: 14px; color: var(--muted); }
+.desktop-footer-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+.desktop-sync-state { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; }
+.desktop-sync-state i { width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+.desktop-sync-state[data-state='pending'] i { background: var(--muted); }
+.desktop-sync-state[data-state='error'] i { background: var(--danger); }
+.desktop-help-button { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 0 4px; border: 0; border-radius: 4px; background: transparent; color: var(--muted); font-size: 10px; }
+.desktop-help-button:hover, .desktop-help-button[aria-expanded='true'] { color: var(--blue); }
+.desktop-help { margin: 8px 0 0; padding: 10px 12px; border-radius: 7px; background: var(--surface); font-size: 11px; line-height: 1.8; }
 .desktop-tasks-error { color: var(--danger); background: var(--paper); padding: 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; overflow-wrap: anywhere; }
 @media (max-width: 760px) { .today-actions .desktop-window-trigger { display: none; } }
+
+.desktop-tasks-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 22px 0 16px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.desktop-tasks-tabs button { display: flex; justify-content: center; align-items: center; gap: 9px; padding: 8px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font-size: 12px; }
+.desktop-tasks-tabs button[aria-selected='true'] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 4px var(--shadow); }
+.desktop-tasks-tabs button span { min-width: 18px; padding: 1px 4px; border-radius: 4px; background: var(--line); font-size: 10px; }
+.desktop-tasks-tabs button[aria-selected='true'] span { background: var(--blue-soft); color: var(--blue); }
+.desktop-tasks-list li.is-done { align-items: center; border-left-color: var(--line); background: var(--surface); color: var(--muted); }
+.desktop-tasks-list li.is-done > div > span { text-decoration: line-through; text-decoration-color: var(--line); }
+.desktop-task-done { flex-shrink: 0; color: var(--green); }
+.desktop-task-restore { flex-shrink: 0; }
+
+.desktop-tasks-heading, .desktop-tasks-tabs, .desktop-tasks-undo, .desktop-tasks-error { flex-shrink: 0; }
+#desktop-task-panel { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }

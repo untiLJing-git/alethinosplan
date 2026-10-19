@@ -15,7 +15,14 @@
   <a href="https://github.com/untiLJing-git/realplan/issues/new/choose">提交反馈</a>
 </p>
 
-<p align="center"><sub>React · TypeScript · Vite · Supabase · Cloudflare Pages · Apache-2.0</sub></p>
+<p align="center">
+  <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&amp;logo=react&amp;logoColor=20232A" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&amp;logo=typescript&amp;logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=flat-square&amp;logo=vite&amp;logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&amp;logo=supabase&amp;logoColor=18392B" alt="Supabase" />
+  <img src="https://img.shields.io/badge/Cloudflare_Pages-F38020?style=flat-square&amp;logo=cloudflarepages&amp;logoColor=white" alt="Cloudflare Pages" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-E5E7EB?style=flat-square&amp;labelColor=D1D5DB" alt="License: Apache-2.0" /></a>
+</p>
 
 ---
 

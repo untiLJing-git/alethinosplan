@@ -63,7 +63,7 @@ test('theme storage changes synchronize across tabs and storage failures do not 
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('Storage blocked'); }; });
   await chooseTheme(page, '深色');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.locator('.theme-save-note')).toContainText('未允许保存');
+  await expect(page.locator('.theme-save-note:visible')).toContainText('未允许保存');
   await expect(page.getByTestId('sticky-task')).toHaveCount(3);
 });
 
@@ -86,27 +86,65 @@ test('the single theme button stays at the lower left and cycles with mouse and 
   await expect(button).toHaveAttribute('data-theme-mode', 'system');
   await expect(page.getByRole('radiogroup', { name: '主题模式' })).toHaveCount(0);
   await expect(page.locator('.theme-panel')).toHaveCount(0);
+  await page.getByLabel('账号菜单').click();
+  await expect(themeButton(page)).toHaveCount(1);
+  await expect(page.locator('.account-utilities')).toBeHidden();
+});
+
+test('mobile theme cycling lives in the account menu beside feedback', async ({ page }) => {
   for (const width of [320, 390, 760]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/?demo=1');
-    const mobile = (await button.boundingBox())!;
-    expect(mobile.x).toBeGreaterThanOrEqual(0);
-    expect(mobile.x + mobile.width).toBeLessThanOrEqual(width / 2);
-    expect(mobile.y).toBeGreaterThan(760);
-    expect(mobile.y + mobile.height).toBeLessThanOrEqual(844);
+    await expect(page.locator('.sidebar-utilities')).toBeHidden();
+    await expect(themeButton(page)).toHaveCount(0);
+    const summary = page.getByLabel('账号菜单');
+    await summary.click();
+    const button = themeButton(page);
+    await expect(button).toHaveCount(1);
+    const bounds = (await button.boundingBox())!;
+    const email = (await page.locator('.account-email').boundingBox())!;
+    const feedback = (await page.getByRole('link', { name: /反馈与建议/ }).boundingBox())!;
+    expect(bounds.height).toBeGreaterThanOrEqual(44);
+    expect(bounds.y).toBeGreaterThanOrEqual(email.y + email.height);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(feedback.y);
+    expect(bounds.x).toBeGreaterThanOrEqual(0);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await chooseTheme(page, '浅色');
     await button.focus();
     await page.keyboard.press('Enter');
     await expect(button).toHaveAttribute('data-theme-mode', 'dark');
+    await page.keyboard.press('Space');
+    await expect(button).toHaveAttribute('data-theme-mode', 'system');
+    if (width === 390) await page.screenshot({ path: 'test-results/theme-toggle-mobile.png', fullPage: true });
+    await page.keyboard.press('Escape');
+    await expect(summary).toBeFocused();
+    await expect(button).toHaveCount(0);
+    await summary.click();
+    await page.locator('.page-heading h1').click();
+    await expect(button).toHaveCount(0);
     await page.getByTestId('sticky-task').first().getByRole('button', { name: /^完成：/ }).click();
     await expect(page.locator('.toast')).toBeVisible();
     const toast = (await page.locator('.toast').boundingBox())!;
-    expect(toast.y + toast.height).toBeLessThanOrEqual(mobile.y);
-    await button.click();
-    await expect(button).toHaveAttribute('data-theme-mode', 'system');
-    if (width === 390) await page.screenshot({ path: 'test-results/theme-toggle-mobile.png', fullPage: true });
+    expect(toast.y + toast.height).toBeLessThanOrEqual(844);
   }
+});
+
+test('mobile theme storage feedback stays inside the account menu', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/?demo=1');
+  await page.getByLabel('账号菜单').click();
+  await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('Storage blocked'); }; });
+  await chooseTheme(page, '深色');
+  const note = page.locator('.theme-save-note:visible');
+  await expect(note).toContainText('未允许保存');
+  const bounds = (await note.boundingBox())!;
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(320);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(page.locator('.account-utilities')).toBeHidden();
+  await expect(themeButton(page)).toHaveCount(1);
+  await expect(themeButton(page)).toHaveAttribute('data-theme-mode', 'dark');
 });
 
 test('context menu follows the main theme and can change it for both windows', async ({ page }) => {

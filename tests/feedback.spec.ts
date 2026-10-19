@@ -53,8 +53,9 @@ test.describe('mobile feedback', () => {
       await page.setViewportSize({ width, height: 844 });
       await page.goto('/?demo=1');
       await expect(page.locator('.sidebar-utilities > .feedback-link')).toBeHidden();
-      await expect(page.getByRole('button', { name: /^切换主题：/ })).toBeVisible();
+      await expect(page.getByRole('button', { name: /^切换主题：/ })).toHaveCount(0);
       await page.getByLabel('账号菜单').tap();
+      await expect(page.getByRole('button', { name: /^切换主题：/ })).toBeVisible();
       const link = page.getByRole('link', { name: /反馈与建议/ });
       await expectSafeLink(link);
       await expect(link).toBeVisible();

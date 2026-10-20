@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Locator } from '@playwright/test';
 
-const feedbackURL = 'https://github.com/untiLJing-git/realplan/issues/new/choose';
+const feedbackURL = 'https://github.com/untiLJing-git/alethinosplan/issues/new/choose';
 async function expectSafeLink(link: Locator) {
   await expect(link).toHaveAttribute('href', feedbackURL);
   await expect(link).toHaveAttribute('target', '_blank');

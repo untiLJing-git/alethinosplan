@@ -13,7 +13,7 @@ test('Pages serves the built app and keeps development demo disabled', async ({ 
   await expect(page.locator('.auth-submit')).toBeEnabled();
   await expect(page.locator('.app-shell')).toHaveCount(0);
   await expect(page.locator('.product-preview button')).toHaveCount(0);
-  await expect(page.getByRole('link', { name: /反馈与建议/ })).toHaveAttribute('href', 'https://github.com/untiLJing-git/realplan/issues/new/choose');
+  await expect(page.getByRole('link', { name: /反馈与建议/ })).toHaveAttribute('href', 'https://github.com/untiLJing-git/alethinosplan/issues/new/choose');
   expect(errors).toEqual([]);
   await page.screenshot({ path: 'test-results/pages-auth.png', fullPage: true });
 });

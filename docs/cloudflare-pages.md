@@ -13,7 +13,7 @@
 
 ## 推荐：连接 Git 仓库
 
-在 Cloudflare 控制台创建 **Pages** 项目，连接 `untiLJing-git/realplan`。
+在 Cloudflare 控制台创建 **Pages** 项目，连接 `untiLJing-git/alethinosplan`。
 
 | 项目 | 填写值 |
 | --- | --- |

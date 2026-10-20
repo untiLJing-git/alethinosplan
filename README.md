@@ -12,7 +12,7 @@
   <a href="#功能一览">功能一览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="docs/cloudflare-pages.md">自行部署</a> ·
-  <a href="https://github.com/untiLJing-git/realplan/issues/new/choose">提交反馈</a>
+  <a href="https://github.com/untiLJing-git/alethinosplan/issues/new/choose">提交反馈</a>
 </p>
 
 <p align="center">
@@ -58,8 +58,8 @@
 想先在本地看看效果？使用 Node.js 24.12.0，克隆项目后运行：
 
 ```sh
-git clone https://github.com/untiLJing-git/realplan.git
-cd realplan
+git clone https://github.com/untiLJing-git/alethinosplan.git
+cd alethinosplan
 npm ci
 npm run dev
 ```
@@ -96,7 +96,7 @@ npm run test:pages    # Pages 本地托管验收
 
 ## 反馈与许可
 
-桌面端可从左侧栏底部「反馈与建议」进入；移动端位于账号菜单，登录页底部也有入口。也可直接 [提交反馈](https://github.com/untiLJing-git/realplan/issues/new/choose)，选择问题反馈或功能建议；提交前可先 [查看已有 Issues](https://github.com/untiLJing-git/realplan/issues)。描述复现步骤、浏览器与设备即可，请勿附带密码、访问令牌或私人任务内容。
+桌面端可从左侧栏底部「反馈与建议」进入；移动端位于账号菜单，登录页底部也有入口。也可直接 [提交反馈](https://github.com/untiLJing-git/alethinosplan/issues/new/choose)，选择问题反馈或功能建议；提交前可先 [查看已有 Issues](https://github.com/untiLJing-git/alethinosplan/issues)。描述复现步骤、浏览器与设备即可，请勿附带密码、访问令牌或私人任务内容。
 
 项目代码采用 [Apache License 2.0](LICENSE)。
 

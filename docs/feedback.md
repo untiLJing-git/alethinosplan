@@ -10,7 +10,7 @@
 
 ## 隐私与操作边界
 
-链接固定指向 https://github.com/untiLJing-git/realplan/issues/new/choose ，不自动附加账号、任务内容、页面查询参数或浏览器日志。使用 noopener、noreferrer 和 no-referrer 防止新页面访问 opener 或收到原页面来源地址。
+链接固定指向 https://github.com/untiLJing-git/alethinosplan/issues/new/choose ，不自动附加账号、任务内容、页面查询参数或浏览器日志。使用 noopener、noreferrer 和 no-referrer 防止新页面访问 opener 或收到原页面来源地址。
 
 提交需要用户在 GitHub 页面上主动完成，可能需要登录 GitHub；应用不会自动创建 Issue。公开反馈中不要放入密码、访问令牌、私人任务或未打码截图。
 

@@ -1,3 +1,4 @@
+import { readLocale } from './i18n';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { todayDate } from './dates';
 import { applyTaskPatch, seedTasks, validateDraft } from './tasks';
@@ -9,7 +10,7 @@ export function demoRepository(): TaskRepository {
   function read(): Task[] {
     const raw = localStorage.getItem(DEMO_KEY);
     if (!raw) {
-      const initial = seedTasks(todayDate());
+      const initial = seedTasks(todayDate(), readLocale());
       localStorage.setItem(DEMO_KEY, JSON.stringify(initial));
       return initial;
     }

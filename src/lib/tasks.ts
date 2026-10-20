@@ -1,3 +1,5 @@
+import { translateMessage } from './i18n';
+import type { Locale } from './i18n';
 import { isDate, shiftDay } from './dates';
 import { TONES } from './types';
 import type { Task, TaskDraft, TaskPatch } from './types';
@@ -26,7 +28,7 @@ export function scheduledPatch(date: string): TaskPatch {
   return { plannedDate: date, status: 'planned', completedAt: null };
 }
 
-export function seedTasks(today: string): Task[] {
+export function seedTasks(today: string, locale: Locale = 'zh-CN'): Task[] {
   const createdAt = new Date().toISOString();
   const entries: Array<Pick<Task, 'title' | 'plannedDate' | 'estimate' | 'tone'>> = [
     { title: '写好作品集的开场', plannedDate: today, estimate: 25, tone: 'lemon' },
@@ -37,5 +39,5 @@ export function seedTasks(today: string): Task[] {
     { title: '想了解一门新的设计课程', plannedDate: null, estimate: null, tone: 'lemon' },
     { title: '找时间给朋友写封信', plannedDate: null, estimate: null, tone: 'rose' },
   ];
-  return entries.map((entry, index) => ({ ...entry, id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`, status: entry.plannedDate ? 'planned' : 'note', createdAt, completedAt: null }));
+  return entries.map((entry, index) => ({ ...entry, title: translateMessage(locale, entry.title), id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`, status: entry.plannedDate ? 'planned' : 'note', createdAt, completedAt: null }));
 }

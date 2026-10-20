@@ -3,6 +3,7 @@
 @import './desktop-window.css';
 @import './theme.css';
 @import './feedback.css';
+@import './language.css';
 
 :root {
   color-scheme: light;

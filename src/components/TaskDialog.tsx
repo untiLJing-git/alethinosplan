@@ -1,3 +1,4 @@
+import { useLocale } from '../hooks/LocaleProvider';
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { LoaderCircle, Trash2, X } from 'lucide-react';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function TaskDialog({ editor, onClose, onSave, onDelete }: Props) {
+  const { t, translateMessage } = useLocale();
   const dialog = useRef<HTMLDialogElement>(null);
   const [title, setTitle] = useState(editor.task?.title || '');
   const [date, setDate] = useState(editor.date || '');
@@ -42,12 +44,12 @@ export function TaskDialog({ editor, onClose, onSave, onDelete }: Props) {
 
   return <dialog ref={dialog} className="task-dialog" onCancel={event => { event.preventDefault(); if (!busy) onClose(); }} onClick={event => { if (event.target === event.currentTarget && !busy) onClose(); }} aria-labelledby="task-dialog-heading">
     <form onSubmit={event => void save(event)}>
-      <div className="dialog-heading"><h2 id="task-dialog-heading">{isNote ? '随手记' : editor.task ? '编辑任务' : '新建任务'}</h2><button type="button" className="icon-button" onClick={onClose} disabled={busy} aria-label="关闭"><X size={20} /></button></div>
-      <label className="field">{isNote ? '记下什么？' : '准备做什么？'}<textarea name="title" value={title} onChange={event => setTitle(event.target.value)} placeholder={isNote ? '一个想法，或一件还没安排的事' : '写下一件具体的事'} maxLength={160} autoFocus required rows={3} disabled={busy} /></label>
-      {!isNote && <><div className="form-grid"><label className="field">计划日期<input name="date" type="date" min="1900-01-01" max="2100-12-31" value={date} onChange={event => setDate(event.target.value)} required disabled={busy || isDone} /></label><label className="field">预计分钟<input name="estimate" type="number" min={1} max={1440} step={1} value={estimate} onChange={event => setEstimate(event.target.value)} placeholder="可不填" disabled={busy} /></label></div><div className="tone-picker" role="group" aria-label="便签颜色"><span>颜色</span>{TONES.map((value, index) => <button type="button" className={`tone-dot tone-${value}`} key={value} aria-label={['浅黄', '浅蓝', '浅粉', '浅绿'][index]} aria-pressed={tone === value} onClick={() => setTone(value)} disabled={busy} />)}</div></>}
-      {error && <p className="form-error" role="alert">{error}</p>}
-      <div className="dialog-footer"><div className="dialog-secondary">{editor.task && <button type="button" className="text-button danger" onClick={() => setConfirmDelete(value => !value)} disabled={busy}><Trash2 size={15} />删除</button>}{!isNote && editor.task && !isDone && <button type="button" className="text-button" onClick={() => void save(undefined, true)} disabled={busy}>暂不安排</button>}</div><button type="submit" className="button primary" disabled={busy}>{busy && <LoaderCircle className="spin" size={16} />}{isNote ? '记下' : '保存'}</button></div>
-      {confirmDelete && <div className="delete-confirm" role="alert"><span>删除这件事？此操作不可撤销。</span><button type="button" className="text-button" onClick={() => setConfirmDelete(false)} disabled={busy}>取消</button><button type="button" className="button danger-fill" onClick={() => void remove()} disabled={busy}>确定删除</button></div>}
+      <div className="dialog-heading"><h2 id="task-dialog-heading">{isNote ? t('随手记') : editor.task ? t('编辑任务') : t('新建任务')}</h2><button type="button" className="icon-button" onClick={onClose} disabled={busy} aria-label={t("关闭")}><X size={20} /></button></div>
+      <label className="field">{isNote ? t('记下什么？') : t('准备做什么？')}<textarea name="title" value={title} onChange={event => setTitle(event.target.value)} placeholder={isNote ? t('一个想法，或一件还没安排的事') : t('写下一件具体的事')} maxLength={160} autoFocus required rows={3} disabled={busy} /></label>
+      {!isNote && <><div className="form-grid"><label className="field">{t("计划日期")}<input name="date" type="date" min="1900-01-01" max="2100-12-31" value={date} onChange={event => setDate(event.target.value)} required disabled={busy || isDone} /></label><label className="field">{t("预计分钟")}<input name="estimate" type="number" min={1} max={1440} step={1} value={estimate} onChange={event => setEstimate(event.target.value)} placeholder={t("可不填")} disabled={busy} /></label></div><div className="tone-picker" role="group" aria-label={t("便签颜色")}><span>{t("颜色")}</span>{TONES.map((value, index) => <button type="button" className={`tone-dot tone-${value}`} key={value} aria-label={[t('浅黄'), t('浅蓝'), t('浅粉'), t('浅绿')][index]} aria-pressed={tone === value} onClick={() => setTone(value)} disabled={busy} />)}</div></>}
+      {error && <p className="form-error" role="alert">{translateMessage(error)}</p>}
+      <div className="dialog-footer"><div className="dialog-secondary">{editor.task && <button type="button" className="text-button danger" onClick={() => setConfirmDelete(value => !value)} disabled={busy}><Trash2 size={15} />{t("删除")}</button>}{!isNote && editor.task && !isDone && <button type="button" className="text-button" onClick={() => void save(undefined, true)} disabled={busy}>{t("暂不安排")}</button>}</div><button type="submit" className="button primary" disabled={busy}>{busy && <LoaderCircle className="spin" size={16} />}{isNote ? t('记下') : t('保存')}</button></div>
+      {confirmDelete && <div className="delete-confirm" role="alert"><span>{t("删除这件事？此操作不可撤销。")}</span><button type="button" className="text-button" onClick={() => setConfirmDelete(false)} disabled={busy}>{t("取消")}</button><button type="button" className="button danger-fill" onClick={() => void remove()} disabled={busy}>{t("确定删除")}</button></div>}
     </form>
   </dialog>;
 }

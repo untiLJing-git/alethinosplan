@@ -1,3 +1,5 @@
+import { LanguageToggle } from '../components/LanguageToggle';
+import { useLocale } from '../hooks/LocaleProvider';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowLeft, ArrowRight, Eye, EyeOff, LoaderCircle, Mail } from 'lucide-react';
@@ -13,6 +15,7 @@ type AuthMode = 'login' | 'signup' | 'reset' | 'recovery';
 interface Props { recovering: boolean; onRecovered(): void; sessionError?: string }
 
 export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
+  const { t, translateMessage } = useLocale();
   const [mode, setMode] = useState<AuthMode>(recovering ? 'recovery' : 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,8 +26,8 @@ export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
   const [signupOutcome, setSignupOutcome] = useState<SignupOutcome | null>(null);
   const requestPending = useRef(false);
   const [previewInterruption, setPreviewInterruption] = useState(0);
-  const titles = { login: '欢迎回来', signup: '创建你的账号', reset: '找回密码', recovery: '设置新密码' };
-  const submitLabels = { login: '登录', signup: '注册', reset: '发送重置邮件', recovery: '保存新密码' };
+  const titles = { login: t('欢迎回来'), signup: t('创建你的账号'), reset: t('找回密码'), recovery: t('设置新密码') };
+  const submitLabels = { login: t('登录'), signup: t('注册'), reset: t('发送重置邮件'), recovery: t('保存新密码') };
 
   function changeMode(next: AuthMode) {
     if (next === mode || requestPending.current) return;
@@ -72,34 +75,35 @@ export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
   return <main className="auth-page">
     <section className="auth-story" aria-label="alēthinósplan">
       <Brand light />
-      <div className="auth-story-copy"><span className="eyebrow">A LITTLE PLAN. A REAL STEP.</span><h1>从一个念头，<br />到一件完成的事。</h1></div>
+      <div className="auth-story-copy"><span className="eyebrow">A LITTLE PLAN. A REAL STEP.</span><h1>{t("从一个念头，")}<br />{t("到一件完成的事。")}</h1></div>
       <ProductPreview interruption={previewInterruption} enabled={mode === 'login' || mode === 'signup'} />
       <div className="auth-story-note">
-        <p className="auth-story-note-title">不必填满每一天。</p>
-        <p className="auth-story-note-body">留一点余地，把在意的小事慢慢完成。</p>
+        <p className="auth-story-note-title">{t("不必填满每一天。")}</p>
+        <p className="auth-story-note-body">{t("留一点余地，把在意的小事慢慢完成。")}</p>
       </div>
     </section>
     <section className="auth-panel">
+      <div className="auth-language"><LanguageToggle /></div>
       <div className="auth-form-wrap" onFocusCapture={event => {
         if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) setPreviewInterruption(value => value + 1);
       }}>
-        {(mode === 'reset') && <button className="text-button auth-back" type="button" onClick={() => changeMode('login')} disabled={pending}><ArrowLeft size={16} /> 返回登录</button>}
+        {(mode === 'reset') && <button className="text-button auth-back" type="button" onClick={() => changeMode('login')} disabled={pending}><ArrowLeft size={16} /> {t("返回登录")}</button>}
         <h2>{titles[mode]}</h2>
-        <p className="auth-subtitle">{mode === 'signup' ? '用邮箱保存你的计划。' : mode === 'reset' ? '我们会发送一封重置邮件。' : mode === 'recovery' ? '为账号设置新的密码。' : '继续你的计划。'}</p>
-        {(mode === 'login' || mode === 'signup') && <div className="auth-switch" role="group" aria-label="账号操作">
-          <button type="button" aria-pressed={mode === 'login'} onClick={() => changeMode('login')} disabled={pending}>登录</button>
-          <button type="button" aria-pressed={mode === 'signup'} onClick={() => changeMode('signup')} disabled={pending}>注册</button>
+        <p className="auth-subtitle">{mode === 'signup' ? t('用邮箱保存你的计划。') : mode === 'reset' ? t('我们会发送一封重置邮件。') : mode === 'recovery' ? t('为账号设置新的密码。') : t('继续你的计划。')}</p>
+        {(mode === 'login' || mode === 'signup') && <div className="auth-switch" role="group" aria-label={t("账号操作")}>
+          <button type="button" aria-pressed={mode === 'login'} onClick={() => changeMode('login')} disabled={pending}>{t("登录")}</button>
+          <button type="button" aria-pressed={mode === 'signup'} onClick={() => changeMode('signup')} disabled={pending}>{t("注册")}</button>
         </div>}
         <form onSubmit={submit}>
-          {mode !== 'recovery' && <label className="field">邮箱<input type="email" name="email" autoComplete="email" value={email} onChange={event => changeEmail(event.target.value)} placeholder="you@example.com" required disabled={pending} /></label>}
-          {mode !== 'reset' && <label className="field">{mode === 'recovery' ? '新密码' : '密码'}<span className="password-field"><input type={showPassword ? 'text' : 'password'} name="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={event => setPassword(event.target.value)} placeholder={mode === 'login' ? '输入密码' : '至少 8 个字符'} minLength={mode === 'login' ? 1 : 8} required disabled={pending} /><button type="button" className="icon-button" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? '隐藏密码' : '显示密码'}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></span></label>}
-          {mode === 'login' && <div className="auth-forgot"><button className="text-button" type="button" onClick={() => changeMode('reset')} disabled={pending}>忘记密码？</button></div>}
-          {(error || sessionError) && <p className="form-error" role="alert">{error || sessionError}</p>}
-          {mode === 'signup' && (signupOutcome === 'existing-account' || signupOutcome === 'unknown') && <div className="auth-alternatives" role="group" aria-label="已有账号操作"><button className="text-button" type="button" onClick={() => changeMode('login')} disabled={pending}>去登录</button><button className="text-button" type="button" onClick={() => changeMode('reset')} disabled={pending}>找回密码</button></div>}
-          {message && <p className="form-success" role="status"><Mail size={17} />{message}</p>}
+          {mode !== 'recovery' && <label className="field">{t("邮箱")}<input type="email" name="email" autoComplete="email" value={email} onChange={event => changeEmail(event.target.value)} placeholder="you@example.com" required disabled={pending} /></label>}
+          {mode !== 'reset' && <label className="field">{mode === 'recovery' ? t('新密码') : t('密码')}<span className="password-field"><input type={showPassword ? 'text' : 'password'} name="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={event => setPassword(event.target.value)} placeholder={mode === 'login' ? t('输入密码') : t('至少 8 个字符')} minLength={mode === 'login' ? 1 : 8} required disabled={pending} /><button type="button" className="icon-button" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? t('隐藏密码') : t('显示密码')}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></span></label>}
+          {mode === 'login' && <div className="auth-forgot"><button className="text-button" type="button" onClick={() => changeMode('reset')} disabled={pending}>{t("忘记密码？")}</button></div>}
+          {(error || sessionError) && <p className="form-error" role="alert">{translateMessage(error || sessionError)}</p>}
+          {mode === 'signup' && (signupOutcome === 'existing-account' || signupOutcome === 'unknown') && <div className="auth-alternatives" role="group" aria-label={t("已有账号操作")}><button className="text-button" type="button" onClick={() => changeMode('login')} disabled={pending}>{t("去登录")}</button><button className="text-button" type="button" onClick={() => changeMode('reset')} disabled={pending}>{t("找回密码")}</button></div>}
+          {message && <p className="form-success" role="status"><Mail size={17} />{translateMessage(message)}</p>}
           <button className="button primary auth-submit" type="submit" disabled={pending || !supabase}>{pending ? <LoaderCircle className="spin" size={18} /> : null}{submitLabels[mode]}{!pending && <ArrowRight size={17} />}</button>
         </form>
-        {!supabase && <p className="auth-config" role="status">{authConfigurationError}</p>}
+        {!supabase && <p className="auth-config" role="status">{translateMessage(authConfigurationError)}</p>}
       </div>
       <footer className="auth-footer"><span>alēthinósplan</span><FeedbackLink compact /></footer>
     </section>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocale } from './LocaleProvider';
 import { mirrorDesktopTheme } from '../lib/desktopTheme';
 
 interface DocumentPictureInPicture {
@@ -7,6 +8,7 @@ interface DocumentPictureInPicture {
 const api = () => (window as Window & { documentPictureInPicture?: DocumentPictureInPicture }).documentPictureInPicture;
 
 export function useDesktopWindow() {
+  const { locale, t } = useLocale();
   const [portal, setPortal] = useState<HTMLElement | null>(null);
   const [opening, setOpening] = useState(false);
   const [error, setError] = useState('');
@@ -16,6 +18,12 @@ export function useDesktopWindow() {
   const active = useRef(false);
   const generation = useRef(0);
   const supported = window.isSecureContext && typeof api()?.requestWindow === 'function';
+
+  useEffect(() => {
+    if (!portal) return;
+    portal.ownerDocument.documentElement.lang = locale;
+    portal.ownerDocument.title = t('今日计划 · alēthinósplan');
+  }, [portal, locale, t]);
 
   const close = useCallback(() => {
     generation.current += 1;
@@ -44,8 +52,8 @@ export function useDesktopWindow() {
       // A pending request must not reopen private content after logout or navigation.
       if (!active.current || version !== generation.current) { child.close(); return false; }
       const doc = child.document;
-      doc.title = '今日计划 · alēthinósplan';
-      doc.documentElement.lang = 'zh-CN';
+      doc.title = t('今日计划 · alēthinósplan');
+      doc.documentElement.lang = locale;
       doc.body.className = 'desktop-window-body';
       document.querySelectorAll('style, link[rel="stylesheet"]').forEach(source => {
         const clone = source.cloneNode(true) as HTMLElement;

@@ -1,3 +1,4 @@
+import { useLocale } from '../hooks/LocaleProvider';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Check, Monitor, Moon, Sun } from 'lucide-react';
@@ -7,10 +8,11 @@ import { THEME_OPTIONS } from '../lib/theme';
 export interface DesktopMenuState { x: number; y: number; anchor: HTMLElement; taskId?: string }
 export interface DesktopMenuAction { label: string; icon: ReactNode; disabled?: boolean; action(): void }
 interface Props { state: DesktopMenuState; actions: DesktopMenuAction[]; onDismiss(restoreFocus?: boolean): void }
-const labels = { light: '浅色', dark: '深色', system: '跟随系统' };
 const icons = { light: Sun, dark: Moon, system: Monitor };
 
 export function DesktopContextMenu({ state, actions, onDismiss }: Props) {
+  const { t } = useLocale();
+  const labels = { light: t('浅色'), dark: t('深色'), system: t('跟随系统') };
   const theme = useTheme();
   const root = useRef<HTMLDivElement>(null);
   const [point, setPoint] = useState({ x: state.x, y: state.y });
@@ -62,15 +64,15 @@ export function DesktopContextMenu({ state, actions, onDismiss }: Props) {
     win.addEventListener('blur', hide);
     return () => { doc.removeEventListener('pointerdown', outside); doc.removeEventListener('scroll', scrolled, true); doc.removeEventListener('keydown', keys); win.removeEventListener('resize', hide); win.removeEventListener('blur', hide); };
   }, []);
-  return <div ref={root} className="desktop-context-menu" role="menu" aria-label="小窗操作" style={{ left: point.x, top: point.y }}>
-    <div className="desktop-menu-label">今日小窗</div>
+  return <div ref={root} className="desktop-context-menu" role="menu" aria-label={t("小窗操作")} style={{ left: point.x, top: point.y }}>
+    <div className="desktop-menu-label">{t("今日小窗")}</div>
     {actions.map(action => <button key={action.label} type="button" role="menuitem" disabled={action.disabled} onClick={() => { onDismiss(true); action.action(); }}>{action.icon}<span>{action.label}</span></button>)}
     <div className="desktop-menu-divider" role="separator" />
-    <div className="desktop-menu-label">主题</div>
-    <div role="group" aria-label="主题模式">{THEME_OPTIONS.map(option => {
+    <div className="desktop-menu-label">{t("主题")}</div>
+    <div role="group" aria-label={t("主题模式")}>{THEME_OPTIONS.map(option => {
       const Icon = icons[option];
       return <button key={option} type="button" role="menuitemradio" aria-checked={theme.preference === option} onClick={() => { theme.setPreference(option); onDismiss(true); }}><Icon size={15} /><span>{labels[option]}</span>{theme.preference === option && <Check size={14} />}</button>;
     })}</div>
-    <small className="desktop-menu-hint">Shift + 右键使用浏览器菜单</small>
+    <small className="desktop-menu-hint">{t("Shift + 右键使用浏览器菜单")}</small>
   </div>;
 }

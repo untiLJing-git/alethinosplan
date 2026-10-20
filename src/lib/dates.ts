@@ -1,3 +1,5 @@
+import type { Locale } from './i18n';
+
 export function todayDate(now = new Date()): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
@@ -38,12 +40,13 @@ export function monthDates(value: string): string[] {
   return Array.from({ length: Math.ceil((offset + days) / 7) * 7 }, (_, index) => shiftDay(start, index));
 }
 
-export function dayLabel(value: string, weekday = false): string {
-  return new Intl.DateTimeFormat('zh-CN', {
-    month: 'numeric', day: 'numeric', ...(weekday ? { weekday: 'long' as const } : {}), timeZone: 'UTC',
+export function dayLabel(value: string, weekday = false, locale: Locale = 'zh-CN'): string {
+  return new Intl.DateTimeFormat(locale, {
+    month: locale === 'en' ? 'short' : 'numeric', day: 'numeric', ...(weekday ? { weekday: 'long' as const } : {}), timeZone: 'UTC',
   }).format(new Date(`${value}T12:00:00Z`));
 }
 
-export function monthLabel(value: string): string {
+export function monthLabel(value: string, locale: Locale = 'zh-CN'): string {
+  if (locale === 'en') return new Intl.DateTimeFormat('en', { year: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${value}T12:00:00Z`));
   return `${value.slice(0, 4)} 年 ${Number(value.slice(5, 7))} 月`;
 }

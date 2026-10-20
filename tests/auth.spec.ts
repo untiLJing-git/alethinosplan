@@ -62,7 +62,7 @@ test('email registration sends credentials and awaits verification', async ({ pa
   await expect(page.getByLabel('密码', { exact: true })).toHaveAttribute('type', 'password');
   expect(await page.evaluate(() => JSON.stringify({ ...localStorage, ...sessionStorage }))).not.toContain('A-long-test-password-123');
   expect(requests.find(item => item.path === '/auth/v1/signup')?.body?.email).toBe('test@example.com');
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toHaveCount(0);
 });
 
 test('login restores session, queries owned tasks and can log out', async ({ page }) => {
@@ -71,11 +71,11 @@ test('login restores session, queries owned tasks and can log out', async ({ pag
   await page.getByLabel('邮箱', { exact: true }).fill('test@example.com');
   await page.getByLabel('密码', { exact: true }).fill('A-long-test-password-123');
   await page.locator('.auth-submit').click();
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
   await expect(page.getByText('给今天留一件重要的事。')).toBeVisible();
   expect(requests.find(item => item.path === '/auth/v1/token')?.body?.email).toBe('test@example.com');
   await page.reload();
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
   await page.getByLabel('账号菜单').click();
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await expect(page.getByRole('heading', { name: '欢迎回来' })).toBeVisible();
@@ -100,12 +100,12 @@ test('a recovered session can set a new password and leave recovery mode', async
   await page.getByLabel('邮箱', { exact: true }).fill('test@example.com');
   await page.getByLabel('密码', { exact: true }).fill('A-long-test-password-123');
   await page.locator('.auth-submit').click();
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
   await page.goto('/?auth=recovery');
   await expect(page.getByRole('heading', { name: '设置新密码' })).toBeVisible();
   await page.getByLabel('新密码', { exact: true }).fill('A-different-password-456');
   await page.getByRole('button', { name: '保存新密码' }).click();
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
   expect(requests.find(item => item.path === '/auth/v1/user' && item.body?.password)?.body?.password).toBe('A-different-password-456');
   expect(new URL(page.url()).searchParams.has('auth')).toBe(false);
 });

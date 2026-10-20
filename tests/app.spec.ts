@@ -12,7 +12,7 @@ test('public auth has no demo entry and development demo is explicit', async ({ 
   await expect(page.getByRole('button', { name: /先体验/ })).toHaveCount(0);
   await page.screenshot({ path: 'test-results/auth-desktop.png', fullPage: true });
   await page.goto('/?demo=1');
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
   await expect(page.getByTestId('sticky-task')).toHaveCount(3);
 });
 
@@ -24,12 +24,12 @@ test('account menu closes outside without swallowing navigation or internal acti
   await expect(popover).toBeVisible();
   await page.locator('.account-email').click();
   await expect(popover).toBeVisible();
-  await page.getByRole('heading', { name: '我的一天.' }).click();
+  await page.getByRole('heading', { name: '我的一天', exact: true }).click();
   await expect(popover).toBeHidden();
   await trigger.click();
   await page.getByRole('button', { name: '规划日历', exact: true }).click();
   await expect(popover).toBeHidden();
-  await expect(page.getByRole('heading', { name: '规划日历.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '规划日历', exact: true })).toBeVisible();
   await trigger.click();
   await expect(popover).toBeVisible();
   await trigger.click();
@@ -66,7 +66,7 @@ test.describe('account menu on touch screens', () => {
     await expect(page.locator('.account-popover')).toBeVisible();
     await page.locator('.account-email').tap();
     await expect(page.locator('.account-popover')).toBeVisible();
-    await page.getByRole('heading', { name: '我的一天.' }).tap();
+    await page.getByRole('heading', { name: '我的一天', exact: true }).tap();
     await expect(page.locator('.account-popover')).toBeHidden();
   });
 });

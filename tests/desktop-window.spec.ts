@@ -23,6 +23,45 @@ async function openMini(page: Page) {
   return mini;
 }
 
+for (const scheme of ['light', 'dark'] as const) {
+  test(`mini completion icons stay centered in ${scheme} theme at compact widths`, async ({ page }) => {
+    await mockWindow(page);
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto('/?demo=1');
+    const mini = await openMini(page);
+    await expect(mini.locator('html')).toHaveCSS('color-scheme', scheme);
+    for (const width of [380, 260]) {
+      await mini.setViewportSize({ width, height: 560 });
+      for (const button of await mini.locator('.desktop-task-check').all()) {
+        const assertCentered = async () => {
+          const frame = (await button.boundingBox())!;
+          const icon = (await button.locator('svg').boundingBox())!;
+          expect(Math.abs(frame.x + frame.width / 2 - icon.x - icon.width / 2)).toBeLessThan(1);
+          expect(Math.abs(frame.y + frame.height / 2 - icon.y - icon.height / 2)).toBeLessThan(1);
+          expect(icon.x).toBeGreaterThan(frame.x);
+          expect(icon.x + icon.width).toBeLessThan(frame.x + frame.width);
+        };
+        await mini.mouse.move(0, 0);
+        await button.scrollIntoViewIfNeeded();
+        await assertCentered();
+        await button.hover();
+        await assertCentered();
+        await button.focus();
+        await assertCentered();
+      }
+      expect(await mini.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await mini.screenshot({ path: `test-results/mini-check-${scheme}-${width}.png` });
+    }
+    await mini.locator('.desktop-task-check').first().focus();
+    await mini.keyboard.press('Space');
+    await expect(mini.locator('.desktop-task-check')).toHaveCount(2);
+    await expect(page.getByTestId('sticky-task')).toHaveCount(2);
+    await mini.locator('.desktop-tasks-undo button').click();
+    await expect(mini.locator('.desktop-task-check')).toHaveCount(3);
+    await expect(page.getByTestId('sticky-task')).toHaveCount(3);
+  });
+}
+
 test('mini window shares add, complete and undo state with the main page', async ({ page, context }) => {
   await mockWindow(page);
   await page.goto('/?demo=1');
@@ -47,7 +86,7 @@ test('mini window shares add, complete and undo state with the main page', async
   await page.getByRole('button', { name: '规划日历', exact: true }).click();
   await mini.getByRole('button', { name: '回到主页面' }).click();
   await expect.poll(() => mini.isClosed()).toBe(true);
-  await expect(page.getByRole('heading', { name: '我的一天.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
 });
 
 test('closing and reopening works and logout closes the mini window', async ({ page }) => {

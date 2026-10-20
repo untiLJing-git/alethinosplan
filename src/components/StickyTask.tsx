@@ -35,7 +35,7 @@ export function StickyTask({ task, tearing, pending, onComplete, onEdit, onFocus
     <span className="paper-tape" aria-hidden="true" />
     <div className="paper-stub" aria-hidden="true"><Check size={15} /></div>
     <div ref={sheet} className="paper-sheet">
-      <div className="sticky-top"><span className="sticky-kicker">TODAY</span><button className="complete-button" type="button" onClick={() => onComplete(task)} disabled={pending} aria-label={`完成：${task.title}`}><Check size={17} /></button></div>
+      <div className="sticky-top"><span className="sticky-kicker">TODAY</span><button className="complete-button" type="button" onClick={() => onComplete(task)} disabled={pending} aria-label={`完成：${task.title}`}><Check size={18} strokeWidth={2} aria-hidden="true" /></button></div>
       <button className="sticky-title" type="button" onClick={() => onEdit(task)} disabled={pending}>{task.title}</button>
       <div className="sticky-bottom"><span className="sticky-estimate"><Clock3 size={13} />{task.estimate ? `${task.estimate} 分钟` : '时长待定'}</span><div className="sticky-actions"><button type="button" onClick={() => onFocus(task)} disabled={pending} className="sticky-start"><Play size={12} fill="currentColor" />开始</button><button className="icon-button" type="button" onClick={() => onEdit(task)} disabled={pending} aria-label={`编辑：${task.title}`}><MoreHorizontal size={18} /></button></div></div>
     </div>

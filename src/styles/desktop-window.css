@@ -13,7 +13,8 @@
 .desktop-tasks-list li > div { flex: 1; min-width: 0; }
 .desktop-tasks-list li span { font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
 .desktop-tasks-list li small { display: block; margin-top: 6px; font-size: 10px; color: var(--note-dim); }
-.desktop-task-check { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 26px; border: 1px solid var(--note-dim); border-radius: 50%; background: transparent; color: var(--note-ink); }
+.desktop-task-check { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 26px; height: 26px; padding: 0; appearance: none; border: 1px solid var(--note-dim); border-radius: 50%; background: transparent; color: var(--note-ink); line-height: 1; }
+.desktop-task-check svg { display: block; flex-shrink: 0; width: 15px; height: 15px; }
 .desktop-task-check:hover { background: var(--note-fold); }
 .desktop-tasks-empty { color: var(--muted); font-size: 13px; line-height: 1.8; padding: 22px 0; }
 .desktop-tasks-undo { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); }

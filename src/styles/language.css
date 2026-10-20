@@ -1,27 +1,32 @@
 .language-control { position: relative; flex-shrink: 0; }
-.language-toggle { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 100px; background: var(--surface); color: var(--muted); }
+.language-toggle { --language-hover: var(--ink); --language-hover-bg: transparent; --language-active: var(--blue); --language-active-bg: var(--paper); display: inline-flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 100px; background: var(--surface); color: var(--muted); }
 .language-toggle > svg { margin: 0 7px; }
-.language-toggle button { display: grid; place-items: center; min-width: 39px; min-height: 32px; padding: 5px 8px; border: 0; border-radius: 100px; background: transparent; color: inherit; font-size: 11px; font-weight: 600; line-height: 1; transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease; }
-.language-toggle button:hover { color: var(--ink); }
-.language-toggle button[aria-pressed='true'] { color: var(--blue); background: var(--paper); box-shadow: 0 1px 5px var(--shadow); }
+.language-toggle button { display: grid; place-items: center; min-width: 39px; min-height: 32px; padding: 0; border: 0; border-radius: 100px; background: transparent; color: inherit; font-size: 11px; font-weight: 600; line-height: 1; }
+.language-toggle button > span { display: grid; place-items: center; width: 100%; min-height: 32px; padding: 5px 8px; border-radius: inherit; transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease; }
+.language-toggle button:hover > span { color: var(--language-hover); background: var(--language-hover-bg); }
+.language-toggle button[aria-pressed='true'] > span { color: var(--language-active); background: var(--language-active-bg); box-shadow: 0 1px 5px var(--shadow); }
 .language-toggle button:focus-visible { outline-offset: 2px; }
-.app-topbar .language-toggle { background: #ffffff0a; border-color: #ffffff30; color: #dce2f6; }
-.app-topbar .language-toggle button:hover { color: #fff; background: #ffffff12; }
-.app-topbar .language-toggle button[aria-pressed='true'] { color: #263c60; background: #e6efff; }
+.app-topbar .language-toggle { --language-hover: #fff; --language-hover-bg: #ffffff12; --language-active: #263c60; --language-active-bg: #e6efff; background: #ffffff0a; border-color: #ffffff30; color: #dce2f6; }
 .app-topbar .language-toggle button:focus-visible { outline-color: #b4d5ff; }
 .language-save-note { position: absolute; top: calc(100% + 10px); right: 0; z-index: 50; width: 240px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 28px var(--shadow); background: var(--paper); color: var(--muted); font-size: 12px; line-height: 1.6; }
-.auth-panel { position: relative; }
-.auth-language { position: absolute; top: 28px; right: 32px; }
+.auth-language { position: absolute; top: 28px; right: 32px; z-index: 5; }
 :lang(en) .auth-story h1 { line-height: 1.35; letter-spacing: -.6px; }
 :lang(en) .page-heading { flex-wrap: wrap; }
 :lang(en) .day-detail-heading h2 { flex-wrap: wrap; }
 :lang(en) .delete-confirm { flex-wrap: wrap; }
 :lang(en) .desktop-tasks-heading h1 { font-size: 21px; }
 :lang(en) .desktop-footer-bar { flex-wrap: wrap; gap: 5px 10px; }
+@media (pointer: coarse) { .language-toggle button { min-width: 44px; min-height: 44px; } }
 @media (max-width: 760px) {
-  .auth-language { position: static; align-self: flex-end; margin-bottom: 22px; }
+  .auth-language { top: 16px; right: max(24px, calc((100% - 355px) / 2)); }
+  /* The pill is only 32px tall; separate 44px targets remain easy to tap. */
+  .language-toggle { position: relative; isolation: isolate; gap: 0; padding: 0; border: 0; background: transparent; }
+  .language-toggle::before { content: ''; box-sizing: border-box; position: absolute; z-index: -1; inset: 6px 0; border: 1px solid var(--line); border-radius: inherit; background: var(--surface); pointer-events: none; }
   .language-toggle > svg { display: none; }
-  .language-toggle button { min-height: 36px; min-width: 38px; padding-inline: 7px; }
+  .language-toggle button { min-width: 44px; min-height: 44px; }
+  .language-toggle button > span { width: 36px; min-height: 26px; padding: 0; }
+  .app-topbar .language-toggle { background: transparent; }
+  .app-topbar .language-toggle::before { border-color: #ffffff30; background: #ffffff0a; }
   .app-topbar .account-area { gap: 10px; }
   .app-topbar .demo-badge { display: none; }
   :lang(en) .active-focus-bar { flex-wrap: wrap; }
@@ -31,4 +36,3 @@
   .app-topbar .brand-symbol { width: 18px; height: 18px; }
   .app-topbar .account-area { gap: 7px; }
 }
-@media (pointer: coarse) { .language-toggle button { min-width: 44px; min-height: 44px; } }

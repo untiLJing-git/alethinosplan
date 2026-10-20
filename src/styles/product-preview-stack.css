@@ -80,17 +80,17 @@
 @media (max-width: 760px) {
   .product-preview { max-width: 355px; margin: 15px auto 0; }
   .preview-stage { height: 125px; }
-  .preview-panel { top: 14px; left: 4%; width: 85%; height: 108px; padding: 9px 11px; border-radius: 7px; box-shadow: 0 5px 15px var(--shadow); }
+  .preview-panel { top: 14px; left: 7.5%; width: 85%; height: 108px; padding: 9px 11px; border-radius: 7px; box-shadow: 0 5px 15px var(--shadow); }
   .preview-panel[data-position='middle'] { transform: translate(19px, -7px) rotate(4deg) scale(.94); opacity: .4; }
   .preview-panel[data-position='back'] { transform: translate(-9px, -13px) rotate(-5deg) scale(.88); opacity: .2; }
   .preview-panel-heading { min-height: 17px; padding-bottom: 4px; margin-bottom: 5px; border-bottom: none; font-size: 11px; gap: 5px; }
   .preview-panel-heading > svg { width: 11px; height: 11px; }
   .preview-panel-heading small { font-size: 9px; }
-  .preview-panel .preview-note { left: 14%; top: 34px; width: 185px; --tilt: -2deg; }
-  .preview-note .paper-sheet { min-height: 60px; padding: 7px 11px; box-shadow: 0 3px 6px var(--shadow); }
+  .preview-panel .preview-note { left: calc(50% - 92.5px); top: 34px; width: 185px; --tilt: -2deg; }
+  .preview-note .paper-sheet { min-height: 74px; padding: 7px 11px; box-shadow: 0 3px 6px var(--shadow); }
   .preview-note .sticky-top { min-height: 13px; }
   .preview-note .sticky-kicker { font-size: 9px; }
-  .preview-note .sticky-title { font-size: 13px; margin-top: 5px; line-height: 1.4; }
+  .preview-note .sticky-title { min-height: 36.4px; font-size: 13px; margin-top: 5px; line-height: 1.4; }
   .preview-note .sticky-bottom, .preview-note .paper-stub, .preview-cursor, .preview-window-lines { display: none; }
   .preview-note .paper-tape { width: 30px; height: 9px; left: calc(50% - 15px); top: -4px; }
   .preview-check { width: 14px; height: 14px; }

@@ -74,7 +74,7 @@ export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
 
   return <main className="auth-page">
     <section className="auth-story" aria-label="alēthinósplan">
-      <Brand light />
+      <div className="auth-brand-row"><Brand light /></div>
       <div className="auth-story-copy"><span className="eyebrow">A LITTLE PLAN. A REAL STEP.</span><h1>{t("从一个念头，")}<br />{t("到一件完成的事。")}</h1></div>
       <ProductPreview interruption={previewInterruption} enabled={mode === 'login' || mode === 'signup'} />
       <div className="auth-story-note">
@@ -82,8 +82,8 @@ export function AuthPage({ recovering, onRecovered, sessionError }: Props) {
         <p className="auth-story-note-body">{t("留一点余地，把在意的小事慢慢完成。")}</p>
       </div>
     </section>
+    <div className="auth-language"><LanguageToggle /></div>
     <section className="auth-panel">
-      <div className="auth-language"><LanguageToggle /></div>
       <div className="auth-form-wrap" onFocusCapture={event => {
         if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) setPreviewInterruption(value => value + 1);
       }}>

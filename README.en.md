@@ -48,7 +48,7 @@
 
 ## Choose your language
 
-Use the **中文 / EN** switch in the top-right corner, next to the account menu. The sign-in page has the same control above the form, including on mobile.
+Use the **中文 / EN** switch in the top-right corner, next to the account menu. On mobile, the sign-in page places the same compact control beside the brand; on desktop, it sits above the form.
 
 - The app starts in Simplified Chinese and remembers your explicit choice in this browser.
 - Switching languages preserves your current view, form input, and running timer. Open tabs and the mini window stay in sync.

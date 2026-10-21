@@ -31,6 +31,8 @@ export const englishMessages = {
   "结束计时": "End timer",
   "结束计时，不完成任务": "End timer without completing the task",
   "重试": "Try again",
+  "页面加载失败，请刷新后重试。": "This page could not be loaded. Refresh to try again.",
+  "刷新页面": "Refresh page",
   "关闭错误提示": "Dismiss error",
   "关闭小窗提示": "Dismiss mini window message",
   "正在打开计划": "Loading your plans",

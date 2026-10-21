@@ -79,6 +79,7 @@ test('English supports task creation, focus, completion, undo, calendar, and not
 
 test('language changes preserve stored content and drafts across tabs', async ({ page, context }) => {
   await page.goto('/?demo=1');
+  await expect(page.getByTestId('sticky-task')).toHaveCount(3);
   const saved = await page.evaluate(key => localStorage.getItem(key), demoKey);
   const other = await context.newPage();
   await other.goto('/?demo=1');

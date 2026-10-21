@@ -91,7 +91,8 @@
   .preview-note .sticky-top { min-height: 13px; }
   .preview-note .sticky-kicker { font-size: 9px; }
   .preview-note .sticky-title { min-height: 36.4px; font-size: 13px; margin-top: 5px; line-height: 1.4; }
-  .preview-note .sticky-bottom, .preview-note .paper-stub, .preview-cursor, .preview-window-lines { display: none; }
+  .preview-note .sticky-bottom, .preview-note .paper-stub, .preview-window-lines { display: none; }
+  .preview-cursor { left: calc(50% + 67px); top: 42px; width: 16px; height: 16px; }
   .preview-note .paper-tape { width: 30px; height: 9px; left: calc(50% - 15px); top: -4px; }
   .preview-check { width: 14px; height: 14px; }
   .preview-check svg { width: 10px; height: 10px; }
@@ -100,10 +101,12 @@
   .preview-calendar-grid { height: 61px; gap: 2px; }
   .preview-calendar-event { height: 4px; padding: 0; font-size: 0; bottom: 2px; }
   .preview-calendar-placeholder { height: 3px; bottom: 2px; }
-  .preview-note-row { min-height: 28px; padding-block: 4px; gap: 7px; font-size: 10px; }
-  .preview-note-row > span { width: 18px; height: 21px; }
+  .preview-panel[data-panel='notes'] { overflow: hidden; }
+  .preview-notes-list { padding-top: 0; }
+  .preview-note-row { min-height: 22px; padding-block: 1px; gap: 7px; font-size: 10px; }
+  .preview-note-row > span { width: 18px; height: 18px; }
+  .preview-note-row > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .preview-note-row > span svg { width: 11px; height: 11px; }
-  .preview-note-row:nth-child(3) { display: none; }
   .preview-result { top: 36px; left: 12px; right: 12px; padding: 9px; gap: 8px; }
   .preview-result-icon { width: 25px; height: 25px; }
   .preview-result strong { font-size: 11px; }

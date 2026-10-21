@@ -4,7 +4,7 @@ import type { Locator } from '@playwright/test';
 import { readable } from './helpers/contrast';
 
 async function readableAll(locator: Locator) {
-  expect(await locator.count()).toBeGreaterThan(0);
+  await expect(locator.first()).toBeVisible();
   for (const element of await locator.all()) await readable(element);
 }
 

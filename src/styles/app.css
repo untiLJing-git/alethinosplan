@@ -197,6 +197,7 @@ input::placeholder, textarea::placeholder { color: var(--placeholder); opacity: 
 .error-banner > span { flex: 1; }
 .loading-state, .boot-state { display: flex; justify-content: center; align-items: center; gap: 12px; min-height: 300px; color: var(--muted); font-size: 13px; }
 .boot-state { flex-direction: column; min-height: 100dvh; gap: 24px; }
+.page-load-error { flex-direction: column; padding: 24px; text-align: center; }
 .spin { animation: spin 900ms linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (min-width: 1600px) { .app-workspace { padding: 45px 65px; } .sticky-board { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

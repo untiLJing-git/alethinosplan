@@ -6,8 +6,14 @@ const secondTitle = '读一章书，记下一个想法';
 
 test.beforeEach(async ({ page }) => {
   await page.clock.install({ time: new Date('2026-10-19T04:00:00Z') });
-  await page.clock.pauseAt(new Date('2026-10-19T04:00:01Z'));
 });
+async function openWorkspace(page: Page) {
+  // Let lazy modules commit before freezing the scheduler used by Suspense.
+  await page.clock.resume();
+  await page.goto('/?demo=1');
+  await expect(page.getByRole('heading', { name: '我的一天', exact: true })).toBeVisible();
+  await page.clock.pauseAt(new Date(await page.evaluate(() => Date.now()) + 1000));
+}
 async function mockWindow(page: Page) {
   await page.addInitScript(() => Object.defineProperty(window, 'documentPictureInPicture', { configurable: true, value: {
     requestWindow: () => Promise.resolve(window.open('about:blank', '_blank', 'popup,width=380,height=560')),
@@ -26,7 +32,7 @@ async function expectTime(page: Page, label: string) {
 }
 
 test('mini can start, pause, resume and complete the same timer shown on the main page', async ({ page }) => {
-  await mockWindow(page); await page.goto('/?demo=1');
+  await mockWindow(page); await openWorkspace(page);
   const mini = await openMini(page);
   await mini.getByRole('button', { name: '开始计时：' + firstTitle, exact: true }).click();
   await expect(mini.getByRole('region', { name: '小窗专注计时' })).toBeVisible();
@@ -52,7 +58,7 @@ test('mini can start, pause, resume and complete the same timer shown on the mai
 });
 
 test('docking from main and closing or reopening mini does not reset elapsed time', async ({ page }) => {
-  await mockWindow(page); await page.goto('/?demo=1');
+  await mockWindow(page); await openWorkspace(page);
   await page.getByTestId('sticky-task').first().getByRole('button', { name: '开始', exact: true }).click();
   await page.clock.runFor(5000);
   await expectTime(page, '已专注 0 分 5 秒');
@@ -77,7 +83,7 @@ test('docking from main and closing or reopening mini does not reset elapsed tim
 });
 
 test('only one task can be timed and task context menu controls the existing session', async ({ page }) => {
-  await mockWindow(page); await page.goto('/?demo=1');
+  await mockWindow(page); await openWorkspace(page);
   const mini = await openMini(page);
   await mini.locator('.desktop-tasks-list li').first().click({ button: 'right' });
   await mini.getByRole('menuitem', { name: '开始计时', exact: true }).click();
@@ -99,7 +105,7 @@ test('only one task can be timed and task context menu controls the existing ses
 });
 
 test('failed completion keeps elapsed time paused and allows a safe retry', async ({ page }) => {
-  await mockWindow(page); await page.goto('/?demo=1');
+  await mockWindow(page); await openWorkspace(page);
   const mini = await openMini(page);
   await mini.getByRole('button', { name: '开始计时：' + firstTitle, exact: true }).click();
   await page.clock.runFor(3500);
@@ -120,7 +126,7 @@ test('failed completion keeps elapsed time paused and allows a safe retry', asyn
 });
 
 test('completing or deleting the active task from main also clears mini focus', async ({ page }) => {
-  await mockWindow(page); await page.goto('/?demo=1');
+  await mockWindow(page); await openWorkspace(page);
   const mini = await openMini(page);
   await mini.getByRole('button', { name: '开始计时：' + firstTitle, exact: true }).click();
   await page.getByRole('button', { name: '完成：' + firstTitle, exact: true }).click();
@@ -134,20 +140,20 @@ test('completing or deleting the active task from main also clears mini focus', 
 });
 
 test('logout closes the timed mini and a new workspace has no old timer', async ({ page }) => {
-  await mockWindow(page); await page.goto('/?demo=1');
+  await mockWindow(page); await openWorkspace(page);
   const mini = await openMini(page);
   await mini.getByRole('button', { name: '开始计时：' + firstTitle, exact: true }).click();
   await page.clock.runFor(2000);
   await page.getByLabel('账号菜单').click();
   await page.getByRole('button', { name: '退出演示 / 登录' }).click();
   await expect.poll(() => mini.isClosed()).toBe(true);
-  await page.goto('/?demo=1');
+  await openWorkspace(page);
   await expect(page.getByTestId('sticky-task')).toHaveCount(3);
   await expect(page.locator('.active-focus-bar')).toHaveCount(0);
 });
 
 test('native PiP timer catches up after a large clock jump and fits narrow windows', async ({ page, context }) => {
-  await page.goto('/?demo=1');
+  await openWorkspace(page);
   test.skip(!await page.evaluate(() => 'documentPictureInPicture' in window), 'Native Document PiP unavailable.');
   await page.getByRole('button', { name: '完成：' + secondTitle, exact: true }).click();
   await expect(page.locator('.completed-row')).toHaveCount(1);
@@ -175,7 +181,7 @@ test('a rejected dock request keeps the main timer and dialog usable', async ({ 
   await page.addInitScript(() => Object.defineProperty(window, 'documentPictureInPicture', { configurable: true, value: {
     requestWindow: () => Promise.reject(new DOMException('Denied', 'NotAllowedError')),
   } }));
-  await page.goto('/?demo=1');
+  await openWorkspace(page);
   await page.getByTestId('sticky-task').first().getByRole('button', { name: '开始', exact: true }).click();
   await page.clock.runFor(3000);
   await page.getByRole('button', { name: '在小窗中继续计时' }).click();

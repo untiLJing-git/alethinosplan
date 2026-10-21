@@ -42,8 +42,7 @@ export function useProductPreview(interruption: number, enabled: boolean) {
 
   const play = useCallback(() => {
     if (!enabled || document.visibilityState === 'hidden'
-      || matchMedia('(prefers-reduced-motion: reduce)').matches
-      || matchMedia('(max-width: 760px)').matches) return;
+      || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     isPlaying.current = true; setPlaying(true);
     showPanel(currentPanel.current);
   }, [enabled, showPanel]);
@@ -54,9 +53,8 @@ export function useProductPreview(interruption: number, enabled: boolean) {
 
   useEffect(() => {
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const compact = matchMedia('(max-width: 760px)');
     const syncPreferences = () => {
-      const allowed = enabled && !reduced.matches && !compact.matches;
+      const allowed = enabled && !reduced.matches;
       if (!allowed) stop();
     };
     const onVisibilityChange = () => { if (document.visibilityState === 'hidden') stop(); };
@@ -68,12 +66,10 @@ export function useProductPreview(interruption: number, enabled: boolean) {
       if (!interrupted.current) play();
     });
     reduced.addEventListener('change', syncPreferences);
-    compact.addEventListener('change', syncPreferences);
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       cancelAnimationFrame(frame); clearTimers(); isPlaying.current = false;
       reduced.removeEventListener('change', syncPreferences);
-      compact.removeEventListener('change', syncPreferences);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, [clearTimers, enabled, play, stop]);

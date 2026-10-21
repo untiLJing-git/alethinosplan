@@ -95,28 +95,79 @@ test('reduced motion is static and preserves the foreground when changed', async
   await expectFront(preview, 'calendar');
 });
 
-test('mobile stack stays compact and keeps the submit action on screen', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
+test.describe('mobile carousel', () => {
+  test.use({ isMobile: true, hasTouch: true });
   for (const width of [320, 390, 760]) {
-    await page.setViewportSize({ width, height: 844 });
+    for (const locale of ['zh-CN', 'en']) {
+      test(`rotates all panels at ${width}px in ${locale}`, async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+        await page.setViewportSize({ width, height: 844 });
+        await page.addInitScript(value => localStorage.setItem('alethinosplan.locale.v1', value), locale);
+        await page.goto('/');
+        const preview = page.locator('.product-preview');
+        await expect(preview).toHaveAttribute('data-playing', 'true');
+        await page.clock.pauseAt(new Date(await page.evaluate(() => Date.now()) + 1000));
+        await expectFront(preview, 'today');
+        await expect(preview.locator('.preview-cursor')).toBeVisible();
+        await expect(preview.locator('.preview-cursor')).toHaveCSS('animation-name', 'preview-cursor-tap');
+        const submit = (await page.locator('.auth-submit').boundingBox())!;
+        expect(submit.y + submit.height).toBeLessThanOrEqual(844);
+        await page.clock.runFor(1750);
+        await expect(preview).toHaveAttribute('data-today-stage', 'tear');
+        await expect(preview.locator('.paper-sheet')).toHaveCSS('animation-duration', '0.8s');
+        await expect(preview).toHaveAttribute('data-today-stage', 'done');
+        await page.clock.runFor(1950);
+        await expectFront(preview, 'calendar');
+        await expect(preview.locator('.preview-calendar-event')).toHaveCSS('animation-name', 'preview-schedule');
+        await page.clock.runFor(3200);
+        await expectFront(preview, 'notes');
+        const newNote = preview.locator('.preview-note-new');
+        await expect(newNote).toBeVisible();
+        await expect(newNote).toHaveCSS('animation-name', 'preview-capture-row');
+        await expect(preview.locator('[data-panel="notes"]')).toHaveCSS('overflow', 'hidden');
+        await expect.poll(async () => {
+          const panel = (await preview.locator('[data-panel="notes"]').boundingBox())!;
+          const row = (await newNote.boundingBox())!;
+          return row.y + row.height - panel.y - panel.height;
+        }).toBeLessThanOrEqual(0);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        expect((await preview.boundingBox())!.height).toBeLessThanOrEqual(125);
+        await expect(page.locator('.auth-story-note')).toBeHidden();
+        expect((await page.locator('.auth-submit').boundingBox())!.y).toBeCloseTo(submit.y, 1);
+        await expect.poll(() => preview.evaluate(element =>
+          element.getAnimations({ subtree: true }).filter(animation => animation.playState === 'running').length,
+        )).toBe(0);
+        await expectFront(preview, 'notes');
+        await page.screenshot({ path: `test-results/product-preview-mobile-${width}-${locale}.png`, fullPage: true });
+        await page.clock.runFor(3200);
+        await expectFront(preview, 'today');
+        await page.locator('input[name="email"]').fill('test@example.com');
+        await expect(preview).toHaveAttribute('data-playing', 'false');
+        await page.locator('.auth-form-wrap h2').tap();
+        await page.clock.runFor(12_000);
+        await expectFront(preview, 'today');
+        await expect(preview).toHaveAttribute('data-playing', 'false');
+        await page.locator('.auth-switch button').nth(1).tap();
+        const signup = (await page.locator('.auth-submit').boundingBox())!;
+        expect(signup.y + signup.height).toBeLessThanOrEqual(844);
+        expect(await page.evaluate(() => localStorage.getItem('alethinosplan.demo.v1'))).toBeNull();
+      });
+    }
+  }
+
+  test('reduced motion stays static on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const preview = page.locator('.product-preview');
-    await expect(preview).toHaveAttribute('data-playing', 'false');
     await expectFront(preview, 'today');
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    const submit = await page.locator('.auth-submit').boundingBox();
-    expect(submit!.y + submit!.height).toBeLessThanOrEqual(844);
-    await page.getByRole('group', { name: '账号操作' }).getByRole('button', { name: '注册', exact: true }).click();
-    const signup = await page.locator('.auth-submit').boundingBox();
-    expect(signup!.y + signup!.height).toBeLessThanOrEqual(844);
-    await expect(preview.locator('.preview-control')).toHaveCount(0);
-    await expect(page.locator('.auth-story-note')).toBeHidden();
-    expect((await preview.boundingBox())!.height).toBeLessThanOrEqual(125);
-    await page.screenshot({ path: `test-results/product-preview-mobile-${width}.png`, fullPage: true });
-  }
+    await expect(preview).toHaveAttribute('data-playing', 'false');
+    await page.clock.runFor(12_000);
+    await expectFront(preview, 'today');
+    expect(await preview.evaluate(element => element.getAnimations({ subtree: true }).length)).toBe(0);
+  });
 });
 
-test('visibility and viewport changes pause without changing the front panel', async ({ page }) => {
+test('hidden pages pause, but resizing preserves playback and the front panel', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   const preview = page.locator('.product-preview');
@@ -138,11 +189,13 @@ test('visibility and viewport changes pause without changing the front panel', a
   await page.clock.runFor(3700);
   await expectFront(preview, 'calendar');
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(preview).toHaveAttribute('data-playing', 'false');
+  await expect(preview).toHaveAttribute('data-playing', 'true');
   await expectFront(preview, 'calendar');
+  await page.clock.runFor(3200);
+  await expectFront(preview, 'notes');
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await expect(preview).toHaveAttribute('data-playing', 'false');
-  await expectFront(preview, 'calendar');
+  await expect(preview).toHaveAttribute('data-playing', 'true');
+  await expectFront(preview, 'notes');
 });
 
 test('the carousel does not use the previous one-shot session flag', async ({ page }) => {

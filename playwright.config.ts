@@ -14,6 +14,14 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: 'http://127.0.0.1:5175',
+    // Existing interaction tests use an explicit preference, independent of IP.
+    storageState: {
+      cookies: [],
+      origins: [5175, 5176, 5177, 8789].map(port => ({
+        origin: `http://127.0.0.1:${port}`,
+        localStorage: [{ name: 'alethinosplan.locale.v1', value: 'zh-CN' }],
+      })),
+    },
     browserName: 'chromium',
     launchOptions: { executablePath },
     viewport: { width: 1440, height: 1000 },

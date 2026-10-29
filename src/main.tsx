@@ -4,7 +4,11 @@ import App from './App';
 import { LocaleProvider } from './hooks/LocaleProvider';
 import { ThemeProvider } from './hooks/ThemeProvider';
 import './styles/app.css';
+import { initializeLocale } from './lib/i18n';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode><LocaleProvider><ThemeProvider><App /></ThemeProvider></LocaleProvider></React.StrictMode>,
-);
+void initializeLocale().then(locale => {
+  document.documentElement.lang = locale;
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode><LocaleProvider><ThemeProvider><App /></ThemeProvider></LocaleProvider></React.StrictMode>,
+  );
+});

@@ -1,12 +1,13 @@
 # Cloudflare Pages 部署
 
-项目是 React + TypeScript + Vite 静态前端，只部署 dist 中的构建产物。不需要 Pages Functions，不迁移 Supabase 数据。
+项目由 React + TypeScript + Vite 静态前端和一个轻量的 Pages Function 组成。静态产物位于 dist；仓库根目录的 `functions/api/locale.ts` 由 Pages/Wrangler 单独构建部署，用于按 IP 地区选择初始语言。不迁移 Supabase 数据。
 
 ## 配置与命令
 
 - `wrangler.jsonc` 是唯一的部署配置，使用 `pages_build_output_dir: "./dist"`，`name` 必须与实际 Pages 项目名一致。
 - `npm run build:pages` 依次检查公开客户端配置、安全清理 dist、执行类型检查和生产构建。
-- `public/_headers` 设置安全响应头及哈希资源的长期缓存；HTML 不设置长期不可变缓存。
+- `public/_headers` 设置静态资源的安全响应头及哈希资源的长期缓存；HTML 不设置长期不可变缓存。
+- `public/_routes.json` 仅将 `/api/locale` 交给 Pages Function，其他请求继续走静态托管及 SPA 回退。Function 自行设置响应头和 `private, no-store`，不依赖静态 `_headers`。不要对语言接口添加强制缓存规则。
 - 没有顶层 `404.html`，依赖 Pages 的 SPA 回退。新增自定义 404 前需要重新验证深链接刷新，不需要额外的全站重定向。
 - `npm run test:pages` 启动 Pages 本地服务，验证生产入口、SPA 刷新、认证查询参数、响应头和缓存。
 - 保留固定版本的 Wrangler，因为 Pages 本地预览和手动发布也使用此工具。
@@ -51,7 +52,13 @@ npx wrangler login
 npm run deploy:pages
 ```
 
-此命令重新构建并上传 dist，不上传仓库根目录。Wrangler 根据当前 Git 分支判断生产或预览发布；请确认 Pages 的生产分支设置。这里不提供伪装成发布预检的 dry-run；发布前使用本地构建和浏览器验收。
+此命令重新构建并上传 dist，同时编译仓库根目录 `functions/` 中的 Pages Function；不上传其他根目录文件。Wrangler 根据当前 Git 分支判断生产或预览发布；请确认 Pages 的生产分支设置。这里不提供伪装成发布预检的 dry-run；发布前使用本地构建和浏览器验收。
+
+## IP 地区语言接口
+
+首次访问且没有手动语言偏好时，前端调用 `/api/locale`。Function 从 Cloudflare 可信的 `request.cf.country` 判断地区，`CN` 返回 `zh-CN`，其他地区及未知值返回 `en`。接口不需要 API key、额外环境变量或定位权限。普通静态托管和 Vite dev 不执行 Pages Functions，此时自动回退英文。
+
+请使用 Pages Git 集成或从仓库根目录执行 Wrangler 发布，确保 Function 与 dist 一并部署；不要只通过控制台拖拽上传 dist。发布后在无语言偏好的新浏览器环境中检查接口返回 JSON，并分别验证大陆和非大陆网络；已有手动偏好会跳过地区查询。不要仅通过伪造 `CF-IPCountry` 请求头验收，服务端不会信任它。
 
 ## Supabase 认证地址
 

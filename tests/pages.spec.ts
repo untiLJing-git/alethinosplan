@@ -63,3 +63,28 @@ test('Pages serves the theme bootstrap and preserves a saved manual theme in pro
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
+
+test('Pages serves a private, non-cacheable language endpoint instead of SPA HTML', async ({ request }) => {
+  const response = await request.get('/api/locale');
+  expect(response.status()).toBe(200);
+  expect(response.headers()['content-type']).toContain('application/json');
+  expect(response.headers()['cache-control']).toBe('private, no-store');
+  expect(response.headers()['x-content-type-options']).toBe('nosniff');
+  const body = await response.json();
+  expect(Object.keys(body)).toEqual(['locale']);
+  expect(['zh-CN', 'en']).toContain(body.locale);
+});
+
+test.describe('Pages first visit without a saved language', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+  test('uses the actual Pages Function response on direct navigation', async ({ page }) => {
+    const lookup = page.waitForResponse(response => new URL(response.url()).pathname === '/api/locale');
+    await page.goto('/calendar');
+    const response = await lookup;
+    expect(response.status()).toBe(200);
+    const { locale } = await response.json();
+    await expect(page.locator('.auth-page')).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    expect(await page.evaluate(() => localStorage.getItem('alethinosplan.locale.v1'))).toBeNull();
+  });
+});

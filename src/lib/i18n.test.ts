@@ -9,13 +9,13 @@ import { seedTasks } from './tasks';
 afterEach(() => vi.unstubAllGlobals());
 
 describe('localization', () => {
-  it('defaults to Chinese when storage is missing, invalid, or inaccessible', () => {
+  it('falls back to English when storage and regional information are unavailable', () => {
     for (const saved of [null, '', 'fr', 'en-US']) {
       vi.stubGlobal('localStorage', { getItem: () => saved });
       expect(readLocale()).toBe(DEFAULT_LOCALE);
     }
     vi.stubGlobal('localStorage', { getItem: () => { throw new Error('Blocked'); } });
-    expect(readLocale()).toBe('zh-CN');
+    expect(readLocale()).toBe('en');
   });
 
   it('reads an explicit preference without depending on browser language', () => {

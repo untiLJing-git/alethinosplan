@@ -118,11 +118,12 @@ test('blocked preference storage still allows switching with an accessible notic
   await expect(page.locator('.language-save-note')).toHaveText('语言偏好未保存，本次切换仍然有效。');
 });
 
-test('invalid saved preferences safely fall back to Chinese', async ({ page }) => {
+test('invalid saved preferences safely fall back to English without a region endpoint', async ({ page }) => {
   await page.addInitScript(key => localStorage.setItem(key, 'invalid'), localeKey);
   await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-  await expect(page.getByRole('button', { name: '切换到中文', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.getByRole('button', { name: 'Switch to English', exact: true })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('mini window follows language changes without restarting the timer', async ({ page }) => {

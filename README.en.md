@@ -50,7 +50,7 @@
 
 Use the **中文 / EN** switch in the top-right corner, next to the account menu. On mobile, the sign-in page places the same compact control beside the brand; on desktop, it sits above the form.
 
-- The app starts in Simplified Chinese and remembers your explicit choice in this browser.
+- On first visit, the app uses your network IP region: Simplified Chinese for mainland China, and English elsewhere (including Hong Kong, Macao, and Taiwan). If the lookup fails, it falls back to English. Your explicit choice is remembered in this browser and takes priority over regional detection.
 - Switching languages preserves your current view, form input, and running timer. Open tabs and the mini window stay in sync.
 - Your task titles and notes stay exactly as you wrote them. A fresh local demo uses the language selected when its sample data is first created; existing demo content is never rewritten.
 - If browser storage is unavailable, the language still changes for the current session, with a notice that the preference couldn't be saved.

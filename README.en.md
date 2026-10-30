@@ -115,4 +115,8 @@ On desktop, **Feedback** is at the bottom of the sidebar. On mobile, it is in th
 
 The project is licensed under the [Apache License 2.0](LICENSE).
 
+## Community
+
+[LINUX DO](https://linux.do/) - A community for open-source and technical discussion.
+
 <p align="center"><sub>A little plan. A real step.</sub></p>

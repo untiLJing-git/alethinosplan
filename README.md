@@ -115,4 +115,8 @@ npm run test:pages    # Pages 本地托管验收
 
 项目代码采用 [Apache License 2.0](LICENSE)。
 
+## 社区交流
+
+[LINUX DO](https://linux.do/) · 开源与技术交流社区。
+
 <p align="center"><sub>A little plan. A real step.</sub></p>
